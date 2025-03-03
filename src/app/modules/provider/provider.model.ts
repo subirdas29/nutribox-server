@@ -9,10 +9,11 @@ const MealProviderSchema = new Schema<IMealProvider>({
     name: { type: String, required: true },
     category: { type: String, required: true },
     price: { type: Number, required: true },
-    ingredients: [String],
+    ingredients: { type: [String], required: true },
+    portionSize: { type: String, required: true },  // Portion size field added
     available: { type: Boolean, default: true }
   }],
-  orders: [{ type: Schema.Types.ObjectId, ref: "Order" }], // Order Reference
+  orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
   pricing: {
     minPrice: { type: Number, required: true },
     maxPrice: { type: Number, required: true }
@@ -31,7 +32,7 @@ const MealProviderSchema = new Schema<IMealProvider>({
     phone: { type: String, required: true },
     email: { type: String }
   },
-  createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });  // Automatically handles `createdAt` and `updatedAt` fields
 
+// Export the model
 export const MealProvider = model<IMealProvider>("MealProvider", MealProviderSchema);

@@ -10,11 +10,10 @@ export type TUser = {
   name: string;
   email: string;
   password: string;
+  role: TUserRole; 
   phone?: string;
-  role: string;
- 
   isDeleted?: boolean;
-  imageUrl?:string;
+  imageUrl?: string;
   address?: string;
   city?: string;
   passwordChangedAt?: Date;

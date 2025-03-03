@@ -25,11 +25,7 @@ const userSchema = new Schema<TUser, UserModel>({
     required: true,
     select: 0,
   },
-  role: {
-    type: String,
-    default: USER_ROLES.customer,
-  },
-
+  role: { type: String, required: true, enum: Object.values(USER_ROLES) },
   passwordChangedAt: {
     type: Date,
   },
