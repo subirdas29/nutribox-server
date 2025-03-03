@@ -12,7 +12,7 @@ export type TUser = {
   password: string;
   phone?: string;
   role: string;
-  status: 'in-progress' | 'blocked';
+ 
   isDeleted?: boolean;
   imageUrl?:string;
   address?: string;

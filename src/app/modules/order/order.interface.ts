@@ -1,26 +1,18 @@
-import {  Types } from "mongoose";
+import { Document, Schema } from "mongoose";
 
-export type TOrder =
+interface MealItem {
+  mealId: Schema.Types.ObjectId;
+  name: string;
+  quantity: number;
+}
 
-// extends Document 
- {
-  user: Types.ObjectId;
-  email:string;
-  cars:{
-    car: Types.ObjectId;
-    quantity:number;
-  }[],
-  totalPrice?: number,
-  status: "Pending" | "Paid" | "Shipped" | "Completed" | "Cancelled",
-  transaction: {
-   id: string,
-   transactionStatus: string,
-   bank_status: string,
-   sp_code: string,
-   sp_message: string,
-   method: string,
-   date_time: string,
- },
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export interface IOrder extends Document {
+  orderId: string;
+  email: string;
+  mealSelection: MealItem[];
+  dietaryPreferences: string[];
+  status: "Pending" | "In Progress" | "Delivered" | "Cancelled";
+  totalPrice: number;
+  orderDate: Date;
+  mealProviderId: Schema.Types.ObjectId; // Meal Provider ID added
+}

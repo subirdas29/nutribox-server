@@ -1,5 +1,7 @@
 
 
-export const orderSearchableFields = ['car','quantity','totalPrice']
 
-export const statusEnum =["Pending", "Paid", "Shipped", "Completed", "Cancelled"]
+
+//  =["Pending", "Paid", "Shipped", "Completed", "Cancelled"]
+
+//  export const statusEnum= ["pending" , "in progress" , "delivered" , "cancelled"]

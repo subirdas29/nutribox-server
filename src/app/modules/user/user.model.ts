@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import {  TUser, UserModel } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { Status, USER_ROLES } from './user.constant';
+import {  USER_ROLES } from './user.constant';
 
 
 
@@ -29,11 +29,7 @@ const userSchema = new Schema<TUser, UserModel>({
     type: String,
     default: USER_ROLES.customer,
   },
-  status: {
-    type: String,
-    enum: Status,
-    default: 'in-progress',
-  },
+
   passwordChangedAt: {
     type: Date,
   },

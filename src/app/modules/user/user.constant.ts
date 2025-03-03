@@ -5,4 +5,4 @@ export const USER_ROLES = {
 
 export const userSearchableFields = ['name',
   'email']
-  export const Status = ['in-progress', 'blocked'];
+  

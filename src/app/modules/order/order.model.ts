@@ -1,58 +1,19 @@
-import { model, Schema } from 'mongoose';
-import { TOrder } from './order.interface';
+import { model, Schema } from "mongoose";
+import { IOrder } from "./order.interface";
 
-import { statusEnum } from './order.constant';
+const OrderSchema = new Schema<IOrder>({
+  orderId: { type: String, required: true },
+  email: { type: String, required: true },
+  mealSelection: [{
+      mealId: { type: Schema.Types.ObjectId, ref: "Meal", required: true },
+      name: { type: String, required: true },
+      quantity: { type: Number, required: true }
+  }],
+  dietaryPreferences: [{ type: String }],
+  status: { type: String, enum: ["Pending", "In Progress", "Delivered", "Cancelled"], default: "Pending" },
+  totalPrice: { type: Number, required: true },
+  orderDate: { type: Date, default: Date.now },
+  mealProviderId: { type: Schema.Types.ObjectId, ref: "MealProvider", required: true } // Added provider reference
+});
 
- 
-
-const orderSchema = new Schema<TOrder>(
-  {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "Car",
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    cars: [
-      {
-        car: {
-          type: Schema.Types.ObjectId,
-          ref: "Car",
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          required: true,
-        },
-      },
-    ],
-    totalPrice: {
-      type: Number,
-      // required: opt,
-    },
-    status: {
-      type: String,
-      enum: statusEnum,
-      default: "Pending",
-    },
-    transaction: {
-      id: String,
-      transactionStatus: String,
-      bank_status: String,
-      sp_code: String,
-      sp_message: String,
-      method: String,
-      date_time: String,
-    },
-  },
-  {
-    timestamps: true,
-  },
-);
-
-
-
-export const Order = model<TOrder>('Order', orderSchema);
+export const Order = model<IOrder>("Order", OrderSchema);
