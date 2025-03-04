@@ -26,6 +26,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
     }
 
+
+
     const { email, role, iat } = decoded;
 
     const user = await User.isUserExist(email);
@@ -44,10 +46,10 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
     // checking if the user is blocked
 
-    const isUserBlocked = user?.status;
-    if (isUserBlocked === 'blocked') {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
-    }
+    // const isUserBlocked = user?.status;
+    // if (isUserBlocked === 'blocked') {
+    //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
+    // }
 
     if (
       user.passwordChangedAt &&

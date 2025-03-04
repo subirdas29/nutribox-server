@@ -1,11 +1,12 @@
 import QueryBuilder from '../../builder/QueryBuilder';
-import { Order } from '../order/order.model';
+
 import { userSearchableFields } from './user.constant';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 import httpStatus from 'http-status';
 
 import AppError from '../../errors/AppError';
+import Order from '../order/order.model';
 
 const registerUser = async (payload: TUser) => {
   const result = await User.create(payload);

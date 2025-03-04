@@ -1,38 +1,12 @@
-import { Document, Schema } from "mongoose";
-
-// Meal item structure
-interface MealItem {
-  mealId: Schema.Types.ObjectId;
-  name: string;
-  quantity: number;
-  price: number; 
-}
-
-
-interface Customization {
-  option: string; 
-  value: string; 
-}
-
-export enum OrderStatus {
-  PENDING = "Pending",
-  IN_PROGRESS = "In Progress",
-  DELIVERED = "Delivered",
-  CANCELLED = "Cancelled",
-}
+import { Schema } from "mongoose";
 
 export interface IOrder extends Document {
-  orderId: string;
-  email: string;
-  customerId: Schema.Types.ObjectId;  
-  mealSelection: MealItem[];          
-  dietaryPreferences?: string[];     
-  customizations?: Customization[];   
-  status: OrderStatus;                 
-  totalPrice: number;                
-  orderDate: Date;                     
-  deliveryDate: Date;                  
-  deliveryTime?: string;            
-  mealProviderId: Schema.Types.ObjectId;  
-  paymentStatus: "Paid" | "Pending";   
-}
+    customerId: Schema.Types.ObjectId;
+    mealId: Schema.Types.ObjectId;
+    status: 'pending' | 'in progress' | 'delivered';
+    totalPrice: number;
+    orderDate: Date;
+    deliveryDate: Date;
+    deliveryTime?: string;
+    customizations?: string[];
+  }

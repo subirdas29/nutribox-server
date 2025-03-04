@@ -25,6 +25,7 @@ const userSchema = new Schema<TUser, UserModel>({
     required: true,
     select: 0,
   },
+  preferences: { type: [String] },
   role: { type: String, required: true, enum: Object.values(USER_ROLES) },
   passwordChangedAt: {
     type: Date,
@@ -34,8 +35,8 @@ const userSchema = new Schema<TUser, UserModel>({
     type: Boolean,
     default: false,
   },
-  phone: { type: String, default: 'N/A' },
-  imageUrl: { type: String},
+  phone: { type: String, default: 'N/A',unique: true },
+  profileImage: { type: String},
   address: { type: String, default: "N/A" },
   city: { type: String, default: "N/A" },
 

@@ -13,9 +13,10 @@ export type TUser = {
   role: TUserRole; 
   phone?: string;
   isDeleted?: boolean;
-  imageUrl?: string;
+  profileImage?: string;
   address?: string;
   city?: string;
+  preferences?: string[];
   passwordChangedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;

@@ -1,28 +1,16 @@
-import { Schema, model } from "mongoose";
-import { IOrder, OrderStatus } from './order.interface'; // Assuming the interface is in order.interface.ts
+import { model, Schema } from "mongoose";
+import { IOrder } from "./order.interface";
 
 const orderSchema = new Schema<IOrder>({
-  orderId: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
-  mealSelection: [{
-    mealId: { type: Schema.Types.ObjectId, ref: 'Meal', required: true },
-    name: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    price: { type: Number, required: true },
-  }],
-  dietaryPreferences: [{ type: String }],
-  customizations: [{
-    option: { type: String, required: true },
-    value: { type: String, required: true },
-  }],
-  status: { type: String, enum: Object.values(OrderStatus), default: OrderStatus.PENDING },
+  customerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  mealId: { type: Schema.Types.ObjectId, ref: 'Meal', required: true },
+  status: { type: String, enum: ['pending', 'in progress', 'delivered'], required: true },
   totalPrice: { type: Number, required: true },
-  orderDate: { type: Date, default: Date.now },
+  orderDate: { type: Date, required: true },
   deliveryDate: { type: Date, required: true },
-  deliveryTime: { type: String },  // Optional
-  mealProviderId: { type: Schema.Types.ObjectId, ref: 'MealProvider', required: true },
-  paymentStatus: { type: String, enum: ['Paid', 'Pending'], default: 'Pending' },
+  deliveryTime: { type: String },
+  customizations: { type: [String] },
 }, { timestamps: true });
 
-export const Order = model<IOrder>('Order', orderSchema);
+const Order = model<IOrder>('Order', orderSchema);
+export default Order;
