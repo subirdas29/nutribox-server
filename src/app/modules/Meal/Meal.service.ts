@@ -75,7 +75,62 @@ const getAllMeals = async (query: Record<string, unknown>) => {
     };
 };
 
+const getSingleMeal = async (mealId: string) => {
+  const meal = await Meal.findById(mealId)
+   
+
+  if (!meal) {
+     throw new AppError(httpStatus.NOT_FOUND, 'Meal not found');
+  }
+
+  if (meal.isDeleted) {
+     throw new AppError(httpStatus.BAD_REQUEST, 'Meal is deleted');
+  }
+
+
+  const result = await Meal.findById(mealId);
+
+  return result
+ 
+};
+
+
+const updateMeal = async (
+  mealId: string,
+  payload: Partial<IMeal>,
+  email: string
+) => {
+
+  const user = await User.findOne({ email: email });
+
+  const mealProvider = await Meal.findOne({
+    mealProvider:user?._id})
+
+    const mealsId = await Meal.findOne({
+      _id:mealId
+    })
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if(!mealProvider){
+    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized for that meal");
+  }
+  if (!mealsId) {
+    throw new AppError(httpStatus.NOT_FOUND, "Meal not found");
+  }
+
+
+
+ 
+
+  return await Meal.findByIdAndUpdate(mealId, payload, { new: true });
+}
+
 export const mealService = {
     createMeal,
-    getAllMeals
+    getAllMeals,
+    getSingleMeal,
+    updateMeal
 };

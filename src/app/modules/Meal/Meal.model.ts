@@ -13,9 +13,13 @@ const mealSchema = new Schema<IMeal>(
     description: { type: String }, // Optional description of the meal
     imageUrls: { type: [String], required: true }, // Array of image URLs
     dietaryPreferences: { type: [String] }, // Optional: Dietary restrictions (e.g., Gluten-free, Vegan)
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
     mealProvider: { type: Schema.Types.ObjectId, ref: "MealProvider", required: true }, // Reference to the Meal Provider
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt fields
+  { timestamps: true } 
 );
 
 // Create the Meal model based on the schema

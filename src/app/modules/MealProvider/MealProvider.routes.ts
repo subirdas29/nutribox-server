@@ -10,7 +10,7 @@ import auth from '../../middlewares/auth';
 const router = express.Router();
 
 router.post('/meal-provider',
-    auth(USER_ROLES.Meal_Provider), 
+    auth(USER_ROLES.mealprovider), 
     MealProviderController.mealProviderController);
 
 router.get('/meal-provider', MealProviderController.getAllMealsController);

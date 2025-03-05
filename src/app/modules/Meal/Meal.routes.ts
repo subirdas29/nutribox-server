@@ -11,10 +11,12 @@ import auth from '../../middlewares/auth';
 const router = express.Router();
 
 router.post('/menu',
-    auth(USER_ROLES.Meal_Provider), 
+    auth(USER_ROLES.mealprovider), 
     MealController.mealController);
 
 router.get('/meals', MealController.getAllMealsController);
+router.get('/meals/:mealId', MealController.getSingleMeal);
+router.patch('/meals/update/:mealId', auth(USER_ROLES.mealprovider), MealController.updateMealController);
 
 export const MealRoutes = router;
 
