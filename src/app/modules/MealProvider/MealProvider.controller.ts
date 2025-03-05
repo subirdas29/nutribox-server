@@ -22,8 +22,8 @@ const mealProviderController = catchAsync(async (req, res) => {
   // Get All MealsController
 const getAllMealsController = catchAsync(async (req, res) => {
   const query = req.query
-
-  const result = await mealProviderServices.getAllMealProvider(query);
+  const {email} = req.user
+  const result = await mealProviderServices.getAllMealProvider(query,email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

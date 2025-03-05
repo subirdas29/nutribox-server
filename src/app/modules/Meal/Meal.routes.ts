@@ -15,8 +15,10 @@ router.post('/menu',
     MealController.mealController);
 
 router.get('/meals', MealController.getAllMealsController);
+// router.get('/meals/mymeals',auth(USER_ROLES.mealprovider), MealController.getMyMeal);
 router.get('/meals/:mealId', MealController.getSingleMeal);
 router.patch('/meals/update/:mealId', auth(USER_ROLES.mealprovider), MealController.updateMealController);
+
 
 export const MealRoutes = router;
 

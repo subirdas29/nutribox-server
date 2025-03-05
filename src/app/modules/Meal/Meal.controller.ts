@@ -33,6 +33,19 @@ const mealController = catchAsync(async (req, res) => {
     });
   });
 
+  // const getMyMeal = catchAsync(async (req, res) => {
+  //   const { mealId } = req.params;
+  //   const {email} = req.user
+  //   const result = await mealService.getSingleMeal(mealId);
+  
+  //   sendResponse(res, {
+  //     statusCode: httpStatus.OK,
+  //     success: true,
+  //     message: "Meal retrieved successfully",
+  //     data: result,
+  //   });
+  // });
+
   const getSingleMeal = catchAsync(async (req, res) => {
     const { mealId } = req.params;
     const result = await mealService.getSingleMeal(mealId);
@@ -72,6 +85,7 @@ const mealController = catchAsync(async (req, res) => {
     mealController,
     getAllMealsController,
     updateMealController,
-    getSingleMeal
+    getSingleMeal,
+    // getMyMeal
   };
   

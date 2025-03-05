@@ -13,7 +13,7 @@ export type TUser = {
   role: TUserRole; 
   phone?: string;
   isDeleted?: boolean;
-  profileImage?: string;
+  profileImage?: string[];
   address?: string;
   city?: string;
   preferences?: string[];

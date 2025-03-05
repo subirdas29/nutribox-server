@@ -36,7 +36,7 @@ const userSchema = new Schema<TUser, UserModel>({
     default: false,
   },
   phone: { type: String, default: 'N/A',unique: true },
-  profileImage: { type: String},
+  profileImage: { type: [String]},
   address: { type: String, default: "N/A" },
   city: { type: String, default: "N/A" },
 

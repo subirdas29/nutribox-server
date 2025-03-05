@@ -2,6 +2,8 @@ import express from 'express';
 import validationRequest from '../../middlewares/validateRequest';
 import { UserController } from './user.controller';
 import { userValidation } from './user.validation';
+import { USER_ROLES } from './user.constant';
+import auth from '../../middlewares/auth';
 ;
 
 const router = express.Router();
@@ -49,7 +51,7 @@ router.post(
 
 router.patch(
   '/profile-data',
-  // auth( USER_ROLES.admin, USER_ROLES.user),
+  auth( USER_ROLES.customer,USER_ROLES.mealprovider),
   validationRequest(userValidation.updateProfileSchema),
   UserController.profileData,
 )

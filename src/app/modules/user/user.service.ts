@@ -146,11 +146,7 @@ const profileData = async (email: string, data: Partial<TUser>) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Your Account is Deleted!')
   }
 
-  // if(user.status === 'blocked')
-  // {
-  //   throw new AppError(httpStatus.BAD_REQUEST,'Your Account is Blocked By Admin. So You cannot update your profile')
-  // }
-
+ 
   const result = await User.findOneAndUpdate({email},data, { new: true }
     );
 
