@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import QueryBuilder from '../../builder/QueryBuilder';
 
 import { userSearchableFields } from './user.constant';
@@ -7,10 +9,46 @@ import httpStatus from 'http-status';
 
 import AppError from '../../errors/AppError';
 import Order from '../order/order.model';
+import mongoose from 'mongoose';
+import MealProvider from '../MealProvider/MealProvider.model';
 
 const registerUser = async (payload: TUser) => {
-  const result = await User.create(payload);
-  return result;
+
+  const session = await mongoose.startSession();
+  
+    try {
+      session.startTransaction();
+    
+      // Transaction-1: Create Meal
+      const userCreate = await User.create([payload], { session });
+     
+      if (!userCreate.length) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
+      }
+  
+    
+      if (userCreate[0]?.role === 'mealprovider') {
+        const userId = userCreate[0]._id
+        // Transaction-2
+        const mealProviderData = await MealProvider.create([{userId}],{session})
+    
+  
+        if (!mealProviderData) {
+          throw new AppError(httpStatus.BAD_REQUEST, 'Failed to add Meal Provider Data');
+        }
+      }
+  
+      await session.commitTransaction();
+      await session.endSession();
+  
+      return userCreate;
+    } catch (err: any) {
+   
+      await session.abortTransaction();
+      await session.endSession();
+      throw new Error('Failed to create user');
+    }
+
 };
 
 // Get All Cars
@@ -75,7 +113,7 @@ const getAUser = async (id:string) => {
 const getMe = async (email: string, role: string) => {
   let result = null;
 
-  if (role === 'provider') {
+  if (role === 'mealprovider') {
     result = await User.findOne({ email})
   }
 

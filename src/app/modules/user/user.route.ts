@@ -14,6 +14,19 @@ router.post(
   UserController.registerUserController,
 );
 
+router.patch(
+  '/profile-data',
+  auth( USER_ROLES.customer,USER_ROLES.mealprovider),
+  validationRequest(userValidation.updateProfileSchema),
+  UserController.profileData,
+)
+
+router.get(
+  '/my-data',
+  auth( USER_ROLES.customer,USER_ROLES.mealprovider),
+  validationRequest(userValidation.updateProfileSchema),
+  UserController.getMe,
+)
 // router.get(
 //   '/all-users',
 //   auth(USER_ROLES.admin),
@@ -49,12 +62,7 @@ router.post(
 //   UserController.unblockUser,
 // )
 
-router.patch(
-  '/profile-data',
-  auth( USER_ROLES.customer,USER_ROLES.mealprovider),
-  validationRequest(userValidation.updateProfileSchema),
-  UserController.profileData,
-)
+
 
 
 export const UserRoutes = router;

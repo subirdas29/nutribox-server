@@ -11,6 +11,7 @@ import MealProvider from "../MealProvider/MealProvider.model";
 
 const createMeal = async (payload: IMeal, email: string) => {
   const user = await User.findOne({ email: email });
+  const mealProviderId = await MealProvider.findOne({userId:user?._id})
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
@@ -18,8 +19,9 @@ const createMeal = async (payload: IMeal, email: string) => {
 
   const providerMeal = {
     ...payload, 
-    mealProvider: user?._id
+    mealProvider: mealProviderId?._id
   };
+
 
   const session = await mongoose.startSession();
 
@@ -28,11 +30,12 @@ const createMeal = async (payload: IMeal, email: string) => {
 
     // Transaction-1: Create Meal
     const mealCreate = await Meal.create([providerMeal], { session });
-
-    if (!mealCreate.length) {
+   
+    if (!mealCreate || mealCreate.length === 0) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create meal');
     }
 
+   
   
     if (mealCreate[0].available) {
       // Transaction-2
@@ -43,7 +46,7 @@ const createMeal = async (payload: IMeal, email: string) => {
       );
 
       if (!newMeal) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to add meal to availableMeals');
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to add as availableMeals');
       }
     }
 
@@ -88,7 +91,14 @@ const getSingleMeal = async (mealId: string) => {
   }
 
 
-  const result = await Meal.findById(mealId);
+  const result = await Meal.findById(mealId)
+  .populate({
+    path: 'mealProvider',
+    populate: {
+      path: 'userId',
+    },
+  }
+);
 
   return result
  
@@ -120,11 +130,6 @@ const updateMeal = async (
   if (!mealsId) {
     throw new AppError(httpStatus.NOT_FOUND, "Meal not found");
   }
-
-
-
- 
-
   return await Meal.findByIdAndUpdate(mealId, payload, { new: true });
 }
 

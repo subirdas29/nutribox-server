@@ -6,7 +6,7 @@ export interface IMeal extends Document {
     category: string;              
     price: number;                    
     ingredients: string[];            
-    portionSize: string;              
+    portionSize: string;       
     available: boolean;              
     description?: string;            
     imageUrls: string[];              

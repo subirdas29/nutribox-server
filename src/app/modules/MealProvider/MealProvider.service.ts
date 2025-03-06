@@ -35,7 +35,9 @@ const mealProvider = async (payload: IMealProvider,email:string) => {
 const getAllMealProvider = async (query:Record<string,unknown>,email:string) => {
   const user = await User.findOne({email})
 
-
+  if(!user){
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
 
   const mealQuery = new QueryBuilder(MealProvider.find({userId:user?._id}).populate("userId").populate("availableMeals").lean(),query)
   .filter()

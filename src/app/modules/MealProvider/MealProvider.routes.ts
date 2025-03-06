@@ -15,5 +15,7 @@ router.post('/meal-provider',
 
 router.get('/meal-provider/mydata',auth(USER_ROLES.mealprovider),  MealProviderController.getAllMealsController);
 
+
+
 export const ProvidersRoutes = router;
 

@@ -9,10 +9,10 @@ import httpStatus from 'http-status';
 // Create Order Controller
 const orderMealController = catchAsync(async (req, res) => {
 
-  // const {email} = req.user;
+  const {email,role} = req.user;
 
   const result = await OrderServices.orderMeal(
-    req.body);
+    req.body,email,role);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -21,6 +21,18 @@ const orderMealController = catchAsync(async (req, res) => {
   });
 });
 
+const getMyOrder = catchAsync(async (req, res) => {
+  const query = req.query
+  const {email} = req.user
+  const result = await OrderServices.getMyOrder(query,email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "My Orders fetched successfully",
+    meta:result.meta,
+    data: result.result,
+  });
+});
 // const verifyPayment = catchAsync(async (req, res) => {
 //   const result = await OrderServices.verifyPayment(req.query.order_id as string);
 
@@ -48,17 +60,39 @@ const orderMealController = catchAsync(async (req, res) => {
 // });
 
 // Get One CarController
-// const oneOrderDetailsController =
-// catchAsync(async (req, res) => {
-//   const orderId = req.params.orderId;
-//   const result = await OrderServices.oneOrderDetails(orderId);
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Car fetched successfully",
-//     data: result,
-//   });
-// });
+const oneOrderDetailsController =
+catchAsync(async (req, res) => {
+  const orderId = req.params.orderId;
+  const result = await OrderServices.oneOrderDetails(orderId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Car fetched successfully",
+    data: result,
+  });
+});
+
+
+const updateOrderController = catchAsync(async (req, res) => {
+  const {
+    body: payload,
+    params: { orderId },
+  } = req;
+
+  const {email} = req.user;
+  const result = await OrderServices.updateOrder(
+    orderId,
+    payload,
+    email
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Order updated successfully",
+    data: result,
+  });
+});
 
 
 // const deleteOrder =catchAsync(async (req, res) => {
@@ -83,9 +117,11 @@ const orderMealController = catchAsync(async (req, res) => {
 
 export const OrderController = {
   orderMealController,
+  updateOrderController,
+  getMyOrder,
   // verifyPayment,
   // ordersRevenueController,
   // getAllOrderController,
-  // oneOrderDetailsController,
+  oneOrderDetailsController,
   // deleteOrder
 };

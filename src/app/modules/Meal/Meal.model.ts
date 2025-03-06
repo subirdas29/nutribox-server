@@ -8,7 +8,10 @@ const mealSchema = new Schema<IMeal>(
     category: { type: String, required: true }, // Category (e.g., Breakfast, Lunch, Dinner)
     price: { type: Number, required: true }, // Price of the meal
     ingredients: { type: [String], required: true }, // Ingredients list (array of strings)
-    portionSize: { type: String, required: true }, // Portion size (e.g., Small, Medium, Large)
+    portionSize: { 
+      type: String, 
+      required: true 
+    }, 
     available: { type: Boolean, required: true }, // Whether the meal is available
     description: { type: String }, // Optional description of the meal
     imageUrls: { type: [String], required: true }, // Array of image URLs
