@@ -65,9 +65,38 @@ const oneOrderDetails = async (orderId: string) => {
 };
 
 
+const getAllOrder = async (query:Record<string,unknown>,email:string) => {
+  const user = await User.findOne({email}).select('_id')
+ 
+  if(!user){
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const mealProvider = await MealProvider.findOne({userId:user}).select('_id')
+
+  if(!mealProvider){
+    throw new AppError(httpStatus.NOT_FOUND, "mealProvider not found");
+  }
+
+
+  const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').lean(),query)
+  .filter()
+  .sort()
+  .paginate()
+  .fields()
+  // .search(userSearchableFields)
+
+  const result = await orderQuery.modelQuery
+  const meta = await orderQuery.countTotal()
+  return {
+    result,
+    meta
+  };
+};
+
 const getMyOrder = async (query:Record<string,unknown>,email:string) => {
   const user = await User.findOne({email})
-  console.log(user)
+  
   if(!user){
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -110,5 +139,6 @@ export const OrderServices = {
   orderMeal,
   oneOrderDetails,
   updateOrder,
-  getMyOrder
+  getMyOrder,
+  getAllOrder
 };

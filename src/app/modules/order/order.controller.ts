@@ -33,6 +33,22 @@ const getMyOrder = catchAsync(async (req, res) => {
     data: result.result,
   });
 });
+
+//mealprovider order
+const getAllOrder = catchAsync(async (req, res) => {
+  const query = req.query
+  const {email} = req.user
+  const result = await OrderServices.getAllOrder(query,email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All Orders fetched successfully",
+    meta:result.meta,
+    data: result.result,
+  });
+});
+
+
 // const verifyPayment = catchAsync(async (req, res) => {
 //   const result = await OrderServices.verifyPayment(req.query.order_id as string);
 
@@ -67,7 +83,7 @@ catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Car fetched successfully",
+    message: "Order fetched successfully",
     data: result,
   });
 });
@@ -119,6 +135,7 @@ export const OrderController = {
   orderMealController,
   updateOrderController,
   getMyOrder,
+  getAllOrder,
   // verifyPayment,
   // ordersRevenueController,
   // getAllOrderController,

@@ -5,7 +5,8 @@ export interface IOrder extends Document {
   mealProviderId:Schema.Types.ObjectId;
   mealId: Schema.Types.ObjectId;
   mealName:string;
-  status?: "pending" | "in progress" | "delivered";
+  status?: 'pending' | 'in-progress' | 'delivered' | 'cancelled'
+  category:string;
   basePrice:number;
   deliveryCharge:number;
   portionPrice:number;

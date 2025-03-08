@@ -4,11 +4,12 @@ import { IOrder } from "./order.interface";
 
 const OrderSchema = new Schema<IOrder>(
   {
-    customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+    customerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   mealProviderId: { type: Schema.Types.ObjectId, ref: 'MealProvider', required: true },
   mealId: { type: Schema.Types.ObjectId, ref: 'Meal', required: true },
   mealName:{ type: String, required: true },
-  status: { type: String, enum: ["pending", "in progress", "delivered"], default: "pending" },
+  category:{ type: String, required: true },
+  status: { type: String, enum: ["pending", "in progress", "delivered","cancelled"], default: "pending" },
   basePrice: { type: Number, required: true },
   deliveryCharge: { type: Number, required: true },
   portionPrice: { type: Number, required: true },
