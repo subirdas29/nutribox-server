@@ -33,18 +33,21 @@ const mealController = catchAsync(async (req, res) => {
     });
   });
 
-  // const getMyMeal = catchAsync(async (req, res) => {
-  //   const { mealId } = req.params;
-  //   const {email} = req.user
-  //   const result = await mealService.getSingleMeal(mealId);
+  const getMyMeal = catchAsync(async (req, res) => {
+    const query = req.query
+    const {email} = req.user
   
-  //   sendResponse(res, {
-  //     statusCode: httpStatus.OK,
-  //     success: true,
-  //     message: "Meal retrieved successfully",
-  //     data: result,
-  //   });
-  // });
+    const result = await mealService.getMyMeal(email,query);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Meals fetched successfully",
+      meta:result.meta,
+      data: result.result,
+    });
+  });
+
+
 
   const getSingleMeal = catchAsync(async (req, res) => {
     const { mealId } = req.params;
@@ -86,6 +89,6 @@ const mealController = catchAsync(async (req, res) => {
     getAllMealsController,
     updateMealController,
     getSingleMeal,
-    // getMyMeal
+    getMyMeal
   };
   
