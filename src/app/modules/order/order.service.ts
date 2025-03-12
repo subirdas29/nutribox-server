@@ -57,9 +57,11 @@ const orderMeal = async (payload: IOrder, email: string, role: string) => {
 
 //single order
 const oneOrderDetails = async (orderId: string) => {
- 
 
   const result = await Order.findById(orderId)
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order is not found");
+  }
   return result
  
 };

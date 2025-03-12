@@ -42,10 +42,10 @@ const auth = (...requiredRoles) => {
             throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is deleted');
         }
         // checking if the user is blocked
-        const isUserBlocked = user === null || user === void 0 ? void 0 : user.status;
-        if (isUserBlocked === 'blocked') {
-            throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is blocked');
-        }
+        // const isUserBlocked = user?.status;
+        // if (isUserBlocked === 'blocked') {
+        //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
+        // }
         if (user.passwordChangedAt &&
             user_model_1.User.isJWTIssuedBeforePasswordChanged(user.passwordChangedAt, iat)) {
             throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not authorized !');

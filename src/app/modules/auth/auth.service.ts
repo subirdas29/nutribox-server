@@ -83,10 +83,7 @@ const changePassword = async(userData:JwtPayload,payload:{oldPassword:string;new
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
 
-  const isUserBlocked = user?.status;
-  if (isUserBlocked === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
-  }
+  
   
   if (!(await User.isThePasswordMatched(payload?.oldPassword, user?.password))) {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');

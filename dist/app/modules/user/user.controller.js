@@ -19,16 +19,11 @@ const user_service_1 = require("./user.service");
 const http_status_1 = __importDefault(require("http-status"));
 const registerUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_service_1.UserServices.registerUser(req.body);
-    const { _id, name, email } = result;
     (0, sendResponse_1.default)(res, {
         success: true,
         message: 'User registered successfully',
         statusCode: http_status_1.default.CREATED,
-        data: {
-            _id,
-            name,
-            email,
-        },
+        data: result
     });
 }));
 const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -74,26 +69,26 @@ const getMe = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, 
         data: result,
     });
 }));
-const blockUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
-    const result = yield user_service_1.UserServices.blockUser(userId);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: 'User is blocked successfully',
-        data: result,
-    });
-}));
-const unblockUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
-    const result = yield user_service_1.UserServices.unblockUser(userId);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: 'User is unblocked successfully',
-        data: result,
-    });
-}));
+// const blockUser = catchAsync(async (req, res) => {
+//   const {userId} = req.params
+//   const result = await UserServices.blockUser(userId);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'User is blocked successfully',
+//     data: result,
+//   });
+// });
+// const unblockUser = catchAsync(async (req, res) => {
+//   const {userId} = req.params
+//   const result = await UserServices.unblockUser(userId);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'User is unblocked successfully',
+//     data: result,
+//   });
+// });
 const profileData = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.user;
     const profileDetails = req.body;
@@ -111,7 +106,7 @@ exports.UserController = {
     getMyOrder,
     getAUser,
     getMe,
-    blockUser,
-    unblockUser,
+    // blockUser,
+    // unblockUser,
     profileData
 };

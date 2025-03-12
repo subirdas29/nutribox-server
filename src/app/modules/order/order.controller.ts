@@ -78,6 +78,7 @@ const getAllOrder = catchAsync(async (req, res) => {
 // Get One CarController
 const oneOrderDetailsController =
 catchAsync(async (req, res) => {
+
   const orderId = req.params.orderId;
   const result = await OrderServices.oneOrderDetails(orderId);
   sendResponse(res, {
@@ -87,6 +88,7 @@ catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 
 
 const updateOrderController = catchAsync(async (req, res) => {

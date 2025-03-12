@@ -62,10 +62,6 @@ const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, 
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'This user is not found !');
     }
-    const isUserBlocked = user === null || user === void 0 ? void 0 : user.status;
-    if (isUserBlocked === 'blocked') {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is blocked');
-    }
     if (!(yield user_model_1.User.isThePasswordMatched(payload === null || payload === void 0 ? void 0 : payload.oldPassword, user === null || user === void 0 ? void 0 : user.password))) {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'Password do not matched');
     }

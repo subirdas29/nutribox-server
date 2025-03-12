@@ -35,15 +35,8 @@ const userSchema = new mongoose_1.Schema({
         required: true,
         select: 0,
     },
-    role: {
-        type: String,
-        default: user_constant_1.USER_ROLES.user,
-    },
-    status: {
-        type: String,
-        enum: user_constant_1.Status,
-        default: 'in-progress',
-    },
+    preferences: { type: [String] },
+    role: { type: String, required: true, enum: Object.values(user_constant_1.USER_ROLES) },
     passwordChangedAt: {
         type: Date,
     },
@@ -52,7 +45,7 @@ const userSchema = new mongoose_1.Schema({
         default: false,
     },
     phone: { type: String, default: 'N/A' },
-    imageUrl: { type: String },
+    profileImage: { type: [String] },
     address: { type: String, default: "N/A" },
     city: { type: String, default: "N/A" },
 }, {

@@ -10,13 +10,41 @@ const user_controller_1 = require("./user.controller");
 const user_validation_1 = require("./user.validation");
 const user_constant_1 = require("./user.constant");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
+;
 const router = express_1.default.Router();
-router.post('/register', (0, validateRequest_1.default)(user_validation_1.userValidation.registerValidationSchema), user_controller_1.UserController.registerUserController);
-router.get('/all-users', (0, auth_1.default)(user_constant_1.USER_ROLES.admin), user_controller_1.UserController.getAllUsers);
-router.get('/:userId', (0, auth_1.default)(user_constant_1.USER_ROLES.admin), user_controller_1.UserController.getAUser);
-router.get('/me/details', (0, auth_1.default)(user_constant_1.USER_ROLES.admin, user_constant_1.USER_ROLES.user), user_controller_1.UserController.getMe);
-router.get('/my-order/details', (0, auth_1.default)(user_constant_1.USER_ROLES.admin, user_constant_1.USER_ROLES.user), user_controller_1.UserController.getMyOrder);
-router.patch('/block-user/:userId', (0, auth_1.default)(user_constant_1.USER_ROLES.admin), user_controller_1.UserController.blockUser);
-router.patch('/unblock-user/:userId', (0, auth_1.default)(user_constant_1.USER_ROLES.admin), user_controller_1.UserController.unblockUser);
-router.patch('/profile-data', (0, auth_1.default)(user_constant_1.USER_ROLES.admin, user_constant_1.USER_ROLES.user), (0, validateRequest_1.default)(user_validation_1.userValidation.updateProfileSchema), user_controller_1.UserController.profileData);
+router.post('/register', 
+// validationRequest(userValidation.registerValidationSchema),
+user_controller_1.UserController.registerUserController);
+router.patch('/profile-data', (0, auth_1.default)(user_constant_1.USER_ROLES.customer, user_constant_1.USER_ROLES.mealprovider), (0, validateRequest_1.default)(user_validation_1.userValidation.updateProfileSchema), user_controller_1.UserController.profileData);
+router.get('/my-data', (0, auth_1.default)(user_constant_1.USER_ROLES.customer, user_constant_1.USER_ROLES.mealprovider), (0, validateRequest_1.default)(user_validation_1.userValidation.updateProfileSchema), user_controller_1.UserController.getMe);
+// router.get(
+//   '/all-users',
+//   auth(USER_ROLES.admin),
+//   UserController.getAllUsers,
+// );
+// router.get(
+//   '/:userId',
+//   auth(USER_ROLES.admin),
+//   UserController.getAUser,
+// );
+// router.get(
+//   '/me/details',
+//   auth( USER_ROLES.admin, USER_ROLES.user),
+//   UserController.getMe,
+// );
+// router.get(
+//   '/my-order/details',
+//   auth( USER_ROLES.admin, USER_ROLES.user),
+//   UserController.getMyOrder,
+// )
+// router.patch(
+//   '/block-user/:userId',
+//   auth(USER_ROLES.admin),
+//   UserController.blockUser,
+// )
+// router.patch(
+//   '/unblock-user/:userId',
+//   auth(USER_ROLES.admin),
+//   UserController.unblockUser,
+// )
 exports.UserRoutes = router;

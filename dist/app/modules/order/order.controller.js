@@ -18,9 +18,9 @@ const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const http_status_1 = __importDefault(require("http-status"));
 // Create Order Controller
-const createOrderController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.user;
-    const result = yield order_service_1.OrderServices.orderACar(email, req.body, req.ip);
+const orderMealController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, role } = req.user;
+    const result = yield order_service_1.OrderServices.orderMeal(req.body, email, role);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
@@ -28,27 +28,52 @@ const createOrderController = (0, catchAsync_1.default)((req, res) => __awaiter(
         data: result,
     });
 }));
-const verifyPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_service_1.OrderServices.verifyPayment(req.query.order_id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.CREATED,
-        success: true,
-        message: 'Order verified successfully',
-        data: result,
-    });
-}));
-// Get All CarsController
-const getAllOrderController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getMyOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const result = yield order_service_1.OrderServices.allOrdersDetails(query);
+    const { email } = req.user;
+    const result = yield order_service_1.OrderServices.getMyOrder(query, email);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Orders fetched successfully",
+        message: "My Orders fetched successfully",
         meta: result.meta,
         data: result.result,
     });
 }));
+//mealprovider order
+const getAllOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const query = req.query;
+    const { email } = req.user;
+    const result = yield order_service_1.OrderServices.getAllOrder(query, email);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "All Orders fetched successfully",
+        meta: result.meta,
+        data: result.result,
+    });
+}));
+// const verifyPayment = catchAsync(async (req, res) => {
+//   const result = await OrderServices.verifyPayment(req.query.order_id as string);
+//   sendResponse(res, {
+//     statusCode: httpStatus.CREATED,
+//     success: true,
+//     message: 'Order verified successfully',
+//     data: result,
+//   });
+// });
+// Get All CarsController
+// const getAllOrderController = catchAsync(async (req, res) => {
+//   const query = req.query
+//   const result = await OrderServices.allOrdersDetails(query);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "Orders fetched successfully",
+//     meta:result.meta,
+//     data: result.result,
+//   });
+// });
 // Get One CarController
 const oneOrderDetailsController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const orderId = req.params.orderId;
@@ -56,35 +81,40 @@ const oneOrderDetailsController = (0, catchAsync_1.default)((req, res) => __awai
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Car fetched successfully",
+        message: "Order fetched successfully",
         data: result,
     });
 }));
-const deleteOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { orderId } = req.params;
-    const result = yield order_service_1.OrderServices.deleteOrder(orderId);
+const updateOrderController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { body: payload, params: { orderId }, } = req;
+    const { email } = req.user;
+    const result = yield order_service_1.OrderServices.updateOrder(orderId, payload, email);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Order cancelled successfully',
+        message: "Order updated successfully",
         data: result,
     });
 }));
+// const deleteOrder =catchAsync(async (req, res) => {
+//   const {orderId} = req.params
+//   const result = await OrderServices.deleteOrder(orderId);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Order cancelled successfully',
+//     data: result,
+//   });
+// });
 // Calculate Revenue Controller
-const ordersRevenueController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_service_1.OrderServices.orderRevenue();
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: 'Revenue calculated successfully',
-        data: result,
-    });
-}));
 exports.OrderController = {
-    createOrderController,
-    verifyPayment,
-    ordersRevenueController,
-    getAllOrderController,
+    orderMealController,
+    updateOrderController,
+    getMyOrder,
+    getAllOrder,
+    // verifyPayment,
+    // ordersRevenueController,
+    // getAllOrderController,
     oneOrderDetailsController,
-    deleteOrder
+    // deleteOrder
 };
