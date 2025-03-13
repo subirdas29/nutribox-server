@@ -34,7 +34,7 @@ const getAllMealProvider = (query, email) => __awaiter(void 0, void 0, void 0, f
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
     }
-    const mealQuery = new QueryBuilder_1.default(MealProvider_model_1.default.find({ userId: user === null || user === void 0 ? void 0 : user._id }).populate("userId").populate("availableMeals").lean(), query)
+    const mealQuery = new QueryBuilder_1.default(MealProvider_model_1.default.find({ userId: user === null || user === void 0 ? void 0 : user._id }).populate("userId").populate("availableMeals"), query)
         .filter()
         .sort()
         .paginate()

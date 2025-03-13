@@ -8,7 +8,7 @@ import { IMeal } from "./Meal.interface";
 import Meal from "./Meal.model";
 import httpStatus from 'http-status';
 import MealProvider from "../MealProvider/MealProvider.model";
-import { execArgv } from "process";
+
 
 const createMeal = async (payload: IMeal, email: string) => {
   const user = await User.findOne({ email: email });
@@ -31,20 +31,20 @@ const createMeal = async (payload: IMeal, email: string) => {
 
     // Transaction-1: Create Meal
     const mealCreate = await Meal.create([providerMeal], { session });
-   
+ 
     if (!mealCreate || mealCreate.length === 0) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create meal');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Firstly Failed to create meal');
     }
-
-   
   
     if (mealCreate[0].available) {
       // Transaction-2
       const newMeal = await MealProvider.findOneAndUpdate(
-        { userId: mealCreate[0].mealProvider },
+        { _id: mealCreate[0].mealProvider },
         { $push: { availableMeals: mealCreate[0]._id } },
         { new: true, session }
       );
+
+
 
       if (!newMeal) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to add as availableMeals');
@@ -64,7 +64,11 @@ const createMeal = async (payload: IMeal, email: string) => {
 
 //all meals for everyone
 const getAllMeals = async (query: Record<string, unknown>) => {
-    const mealQuery = new QueryBuilder(Meal.find().populate("mealProvider").lean(), query)
+
+
+    const mealQuery = new QueryBuilder(Meal.find({isDeleted:false,available:true}).populate({
+      path: 'mealProvider',
+      populate:{path: 'userId'}}), query)
         .filter()
         .sort()
         .paginate()
@@ -86,9 +90,10 @@ const getMyMeal = async (email:string,query: Record<string, unknown>) => {
 
   const mealProvider = await MealProvider.findOne({userId:user}).select('_id')
 
-    const meal = await Meal.findOne({
+    const meal = await Meal.find({
       mealProvider
     })
+
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
@@ -101,7 +106,7 @@ const getMyMeal = async (email:string,query: Record<string, unknown>) => {
       throw new AppError(httpStatus.NOT_FOUND, "Meal not found");
     }
 
-  const mealQuery = new QueryBuilder(Meal.find({isDeleted:false}).populate("mealProvider").lean(), query)
+  const mealQuery = new QueryBuilder(Meal.find({mealProvider,isDeleted:false}).populate("mealProvider"), query)
       .filter()
       .sort()
       .paginate()
@@ -166,7 +171,8 @@ const updateMeal = async (
  
 
   const mealData = await Meal.findById(mealId);
-  if (!mealData || mealData.mealProvider.toString() !== mealProvider._id.toString()) {
+
+  if (!mealData || String(mealData.mealProvider)  !== String(mealProvider._id)) {
     throw new AppError(httpStatus.UNAUTHORIZED, "You are not the owner of this meal");
   }
   
@@ -190,17 +196,23 @@ const updateMeal = async (
       }
   
     
-         // Check if availability changed
-    if (payload.available !== undefined && payload.available !== mealData.available) {
+       // Handle availableMeals updates
+    if (payload.isDeleted === true) {
+      // If meal is marked as deleted, remove it from availableMeals
+      await MealProvider.findOneAndUpdate(
+        { _id: mealProvider },
+        { $pull: { availableMeals: mealId } }, // Removes if exists
+        { session }
+      );
+    } else if (payload.available !== undefined && payload.available !== mealData.available) {
+      // If availability changes, update availableMeals accordingly
       if (payload.available) {
-        // Add meal to availableMeals only if not already present
         await MealProvider.findOneAndUpdate(
           { _id: mealProvider },
           { $addToSet: { availableMeals: mealId } }, // Prevents duplicate addition
           { session }
         );
       } else {
-        // Remove meal from availableMeals if it exists
         await MealProvider.findOneAndUpdate(
           { _id: mealProvider },
           { $pull: { availableMeals: mealId } }, // Removes if exists

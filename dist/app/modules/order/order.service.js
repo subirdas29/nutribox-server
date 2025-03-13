@@ -69,7 +69,7 @@ const getAllOrder = (query, email) => __awaiter(void 0, void 0, void 0, function
     if (!mealProvider) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "mealProvider not found");
     }
-    const orderQuery = new QueryBuilder_1.default(order_model_1.default.find({ mealProviderId: mealProvider }).populate('customerId').lean(), query)
+    const orderQuery = new QueryBuilder_1.default(order_model_1.default.find({ mealProviderId: mealProvider }).populate('customerId'), query)
         .filter()
         .sort()
         .paginate()
@@ -89,7 +89,7 @@ const getMyOrder = (query, email) => __awaiter(void 0, void 0, void 0, function*
     }
     const orderQuery = new QueryBuilder_1.default(order_model_1.default.find({
         customerId: user === null || user === void 0 ? void 0 : user._id
-    }).lean(), query)
+    }).populate('mealId').populate('mealProviderId'), query)
         .filter()
         .sort()
         .paginate()

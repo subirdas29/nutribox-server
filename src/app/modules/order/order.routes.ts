@@ -12,9 +12,7 @@ router.post('/',
     auth(USER_ROLES.customer), 
  OrderController.orderMealController);
 
-// router.get("/verify", OrderController.verifyPayment);
 
-// router.get('/', OrderController.getAllOrderController);
 
 router.get('/:orderId', auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.oneOrderDetailsController);
 router.patch('/orderdetails/:orderId',auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.updateOrderController);
@@ -23,9 +21,6 @@ router.get('/myorder/alldata',auth(USER_ROLES.customer), OrderController.getMyOr
 router.get('/allorder/mealprovider',auth(USER_ROLES.mealprovider), OrderController.getAllOrder);
 
 
-// router.delete('/:orderId',OrderController.deleteOrder)
-
-// router.get('/revenue', OrderController.ordersRevenueController);
 
 export const OrderRoutes = router;
 

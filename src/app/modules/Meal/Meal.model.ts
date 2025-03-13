@@ -12,7 +12,8 @@ const mealSchema = new Schema<IMeal>(
       type: String, 
       required: true 
     }, 
-    available: { type: Boolean, required: true }, // Whether the meal is available
+    available: { type: Boolean, required: true }, 
+    rating: { type: Number, default:0 }, 
     description: { type: String }, // Optional description of the meal
     imageUrls: { type: [String], required: true }, // Array of image URLs
     dietaryPreferences: { type: [String] }, // Optional: Dietary restrictions (e.g., Gluten-free, Vegan)

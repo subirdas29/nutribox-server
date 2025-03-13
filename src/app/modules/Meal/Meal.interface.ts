@@ -13,6 +13,7 @@ export interface IMeal extends Document {
     dietaryPreferences?: string[];   
     mealProvider: Schema.Types.ObjectId;
     isDeleted?: boolean;
+    rating?:number;
     createdAt: Date;
     updatedAt: Date;
   }

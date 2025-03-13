@@ -44,12 +44,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted');
     }
 
-    // checking if the user is blocked
-
-    // const isUserBlocked = user?.status;
-    // if (isUserBlocked === 'blocked') {
-    //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
-    // }
+  
 
     if (
       user.passwordChangedAt &&

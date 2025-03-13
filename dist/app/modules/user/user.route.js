@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRoutes = void 0;
 const express_1 = __importDefault(require("express"));
-const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+// import validationRequest from '../../middlewares/validateRequest';
 const user_controller_1 = require("./user.controller");
-const user_validation_1 = require("./user.validation");
+// import { userValidation } from './user.validation';
 const user_constant_1 = require("./user.constant");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
 ;
@@ -15,8 +15,12 @@ const router = express_1.default.Router();
 router.post('/register', 
 // validationRequest(userValidation.registerValidationSchema),
 user_controller_1.UserController.registerUserController);
-router.patch('/profile-data', (0, auth_1.default)(user_constant_1.USER_ROLES.customer, user_constant_1.USER_ROLES.mealprovider), (0, validateRequest_1.default)(user_validation_1.userValidation.updateProfileSchema), user_controller_1.UserController.profileData);
-router.get('/my-data', (0, auth_1.default)(user_constant_1.USER_ROLES.customer, user_constant_1.USER_ROLES.mealprovider), (0, validateRequest_1.default)(user_validation_1.userValidation.updateProfileSchema), user_controller_1.UserController.getMe);
+router.patch('/profile-data', (0, auth_1.default)(user_constant_1.USER_ROLES.customer, user_constant_1.USER_ROLES.mealprovider), 
+// validationRequest(userValidation.updateProfileSchema),
+user_controller_1.UserController.profileData);
+router.get('/my-data', (0, auth_1.default)(user_constant_1.USER_ROLES.customer, user_constant_1.USER_ROLES.mealprovider), 
+// validationRequest(userValidation.updateProfileSchema),
+user_controller_1.UserController.getMe);
 // router.get(
 //   '/all-users',
 //   auth(USER_ROLES.admin),

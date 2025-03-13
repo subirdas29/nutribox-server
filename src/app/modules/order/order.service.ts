@@ -57,8 +57,9 @@ const orderMeal = async (payload: IOrder, email: string, role: string) => {
 
 //single order
 const oneOrderDetails = async (orderId: string) => {
-
+  
   const result = await Order.findById(orderId)
+
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, "Order is not found");
   }
@@ -81,7 +82,8 @@ const getAllOrder = async (query:Record<string,unknown>,email:string) => {
   }
 
 
-  const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').lean(),query)
+
+  const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId'),query)
   .filter()
   .sort()
   .paginate()
@@ -104,7 +106,7 @@ const getMyOrder = async (query:Record<string,unknown>,email:string) => {
   }
 
   const orderQuery = new QueryBuilder(Order.find({
-    customerId:user?._id}).lean(),query)
+    customerId:user?._id}).populate('mealId').populate('mealProviderId'),query)
   .filter()
   .sort()
   .paginate()

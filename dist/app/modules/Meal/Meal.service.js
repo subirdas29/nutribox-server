@@ -35,11 +35,11 @@ const createMeal = (payload, email) => __awaiter(void 0, void 0, void 0, functio
         // Transaction-1: Create Meal
         const mealCreate = yield Meal_model_1.default.create([providerMeal], { session });
         if (!mealCreate || mealCreate.length === 0) {
-            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create meal');
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Firstly Failed to create meal');
         }
         if (mealCreate[0].available) {
             // Transaction-2
-            const newMeal = yield MealProvider_model_1.default.findOneAndUpdate({ userId: mealCreate[0].mealProvider }, { $push: { availableMeals: mealCreate[0]._id } }, { new: true, session });
+            const newMeal = yield MealProvider_model_1.default.findOneAndUpdate({ _id: mealCreate[0].mealProvider }, { $push: { availableMeals: mealCreate[0]._id } }, { new: true, session });
             if (!newMeal) {
                 throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to add as availableMeals');
             }
@@ -56,7 +56,10 @@ const createMeal = (payload, email) => __awaiter(void 0, void 0, void 0, functio
 });
 //all meals for everyone
 const getAllMeals = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const mealQuery = new QueryBuilder_1.default(Meal_model_1.default.find().populate("mealProvider").lean(), query)
+    const mealQuery = new QueryBuilder_1.default(Meal_model_1.default.find({ isDeleted: false, available: true }).populate({
+        path: 'mealProvider',
+        populate: { path: 'userId' }
+    }), query)
         .filter()
         .sort()
         .paginate()
@@ -72,7 +75,7 @@ const getAllMeals = (query) => __awaiter(void 0, void 0, void 0, function* () {
 const getMyMeal = (email, query) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email: email }).select('_id');
     const mealProvider = yield MealProvider_model_1.default.findOne({ userId: user }).select('_id');
-    const meal = yield Meal_model_1.default.findOne({
+    const meal = yield Meal_model_1.default.find({
         mealProvider
     });
     if (!user) {
@@ -84,7 +87,7 @@ const getMyMeal = (email, query) => __awaiter(void 0, void 0, void 0, function* 
     if (!meal) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal not found");
     }
-    const mealQuery = new QueryBuilder_1.default(Meal_model_1.default.find({ isDeleted: false }).populate("mealProvider").lean(), query)
+    const mealQuery = new QueryBuilder_1.default(Meal_model_1.default.find({ mealProvider, isDeleted: false }).populate("mealProvider"), query)
         .filter()
         .sort()
         .paginate()
@@ -124,7 +127,7 @@ const updateMeal = (mealId, payload, email) => __awaiter(void 0, void 0, void 0,
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized for that meal");
     }
     const mealData = yield Meal_model_1.default.findById(mealId);
-    if (!mealData || mealData.mealProvider.toString() !== mealProvider._id.toString()) {
+    if (!mealData || String(mealData.mealProvider) !== String(mealProvider._id)) {
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not the owner of this meal");
     }
     if (mealData.isDeleted) {
@@ -138,15 +141,19 @@ const updateMeal = (mealId, payload, email) => __awaiter(void 0, void 0, void 0,
         if (!updateMeal) {
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create meal');
         }
-        // Check if availability changed
-        if (payload.available !== undefined && payload.available !== mealData.available) {
+        // Handle availableMeals updates
+        if (payload.isDeleted === true) {
+            // If meal is marked as deleted, remove it from availableMeals
+            yield MealProvider_model_1.default.findOneAndUpdate({ _id: mealProvider }, { $pull: { availableMeals: mealId } }, // Removes if exists
+            { session });
+        }
+        else if (payload.available !== undefined && payload.available !== mealData.available) {
+            // If availability changes, update availableMeals accordingly
             if (payload.available) {
-                // Add meal to availableMeals only if not already present
                 yield MealProvider_model_1.default.findOneAndUpdate({ _id: mealProvider }, { $addToSet: { availableMeals: mealId } }, // Prevents duplicate addition
                 { session });
             }
             else {
-                // Remove meal from availableMeals if it exists
                 yield MealProvider_model_1.default.findOneAndUpdate({ _id: mealProvider }, { $pull: { availableMeals: mealId } }, // Removes if exists
                 { session });
             }
