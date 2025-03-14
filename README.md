@@ -1,100 +1,87 @@
-# Car Hunt Server
+# NutriBox Server
 
-This is the backend server for **Car Hunt**, a car store application. It provides APIs for managing users, cars, and orders. The server is built using **Node.js**, **Express**, **TypeScript**, and **MongoDB** with a modular architecture.
-
+NutriBox is a meal planning and delivery web application that allows users to personalize meal plans, schedule deliveries, and manage orders. This server handles authentication, meal providers, orders, and user management.
 
 ## 🌍 Live Demo
 
-Client Site: [Visit Car Hunt](https://car-hunt.vercel.app/)
-Server Site: [Visit Car Hunt Api](https://car-stores-api.vercel.app/)
+Client Site: [Visit NutriBox](https://nutribox-client.vercel.app/)
+Server Site: [Visit NutriBox Api](https://nutribox-server.vercel.app/)
 ---
 
 ## Features
-
-- **User Management**:
-  - User registration and authentication (JWT-based).
-  - Role-based access control (Admin, User).
-  - Block/unblock users.
-  - Update user profile and change password.
-
-- **Car Management**:
-  - Add, update, and delete cars (Admin only).
-  - Fetch all cars or details of a specific car.
-
-- **Order Management**:
-  - Create and manage orders.
-  - Verify payments.
-  - Fetch revenue statistics.
-
-- **Authentication**:
-  - Login and refresh token.
-  - Password change functionality.
-
----
+- User authentication and authorization (JWT-based)
+- Role-based access control (Customer, Meal Provider)
+- Meal providers can add, update, and manage meals
+- Customers can browse meals, place orders, and manage their profiles
+- Cloud-based image storage with Cloudinary
+- Order tracking and management
 
 ## Technologies Used
+- **Node.js** & **Express.js** - Backend framework
+- **MongoDB** & **Mongoose** - Database & ODM
+- **TypeScript** - Strongly typed JavaScript
+- **JWT** - Authentication & Authorization
+- **Zod** - Input validation
+- **Multer & Cloudinary** - Image upload & storage
+- **ESLint & Prettier** - Code linting & formatting
+- **dotenv** - Environment variable management
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB (with Mongoose)
-- **Authentication**: JSON Web Tokens (JWT)
-- **File Upload**: Multer and Cloudinary
-- **Payment Integration**: ShurjoPay
-- **Validation**: Zod
-- **Linting**: ESLint
-- **Formatting**: Prettier
-- **Environment Variables**: Dotenv
 
----
+## API Routes
+### Auth Routes
+- `POST /auth/login` - User login
+- `POST /auth/refresh-token` - Refresh JWT token
 
-## Auth Routes
+### User Routes
+- `POST /user/register` - Register a new user
+- `PATCH /user/profile-data` - Update profile data
+- `GET /user/my-data` - Get user details
 
-- **POST `/auth/login`**: User login.
-- **POST `/auth/change-password`**: Change user password.
-- **POST `/auth/refresh-token`**: Refresh access token.
+### Order Routes
+- `POST /orders` - Place an order (Customer)
+- `GET /orders/:orderId` - Get order details (Customer, Meal Provider)
+- `PATCH /orders/orderdetails/:orderId` - Update order details
+- `GET /orders/myorder/alldata` - Get customer orders
+- `GET /orders/allorder/mealprovider` - Get all orders for a meal provider
 
----
+### Meal Routes
+- `POST /meals/menu` - Add a new meal (Meal Provider)
+- `GET /meals` - Get all meals
+- `GET /meals/mymeals` - Get meal provider's meals
+- `GET /meals/:mealId` - Get meal details
+- `PATCH /meals/update/:mealId` - Update meal details
 
-## User Routes
+### Meal Provider Routes
+- `POST /meal-provider` - Register as a meal provider
+- `GET /meal-provider/mydata` - Get meal provider's data
 
-- **POST `/user/register`**: Register a new user.
-- **GET `/user/all-users`**: Get all users (Admin only).
-- **GET `/user/:userId`**: Get a specific user (Admin only).
-- **GET `/user/me/details`**: Get logged-in user details.
-- **GET `/user/my-order/details`**: Get logged-in user's order details.
-- **PATCH `/user/block-user/:userId`**: Block a user (Admin only).
-- **PATCH `/user/unblock-user/:userId`**: Unblock a user (Admin only).
-- **PATCH `/user/profile-data`**: Update logged-in user's profile.
+## Installation & Setup
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/subirdas29/car-stores-server
+   cd nutribox-server
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Set up environment variables:
+   Create a `.env` file in the root directory and add the required environment variables.
 
----
+4. Build and run the server:
+   ```sh
+   npm run build
+   npm start
+   ```
+   For development:
+   ```sh
+   npm run start:dev
+   ```
 
-## Car Routes
 
-- **POST `/cars`**: Create a new car (Admin only).
-- **GET `/cars`**: Get all cars.
-- **GET `/cars/:carId`**: Get details of a specific car.
-- **PUT `/cars/:carId`**: Update a car (Admin only).
-- **PATCH `/cars/delete/:carId`**: Soft delete a car (Admin only).
+## Contribution
+Contributions are welcome! Feel free to open an issue or submit a pull request.
 
----
+## License
+This project is licensed under the ISC License.
 
-## Order Routes
-
-- **POST `/orders`**: Create a new order (User only).
-- **GET `/orders/verify`**: Verify payment.
-- **GET `/orders`**: Get all orders.
-- **GET `/orders/:orderId`**: Get details of a specific order.
-- **DELETE `/orders/:orderId`**: Delete an order.
-- **GET `/orders/revenue`**: Get revenue statistics.
-
----
-
-## Scripts
-
-- **Start the server**: `npm start`
-- **Start the server in development mode**: `npm run start:dev`
-- **Build the project**: `npm run build`
-- **Lint the code**: `npm run lint`
-- **Fix linting issues**: `npm run lint:fix`
-- **Format the code**: `npm run format`
-- **Fix formatting issues**: `npm run format:fix`
