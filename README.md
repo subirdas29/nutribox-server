@@ -4,8 +4,8 @@ NutriBox is a meal planning and delivery web application that allows users to pe
 
 ## 🌍 Live Demo
 
-Client Site: [Visit NutriBox](https://nutribox-client.vercel.app/)
-Server Site: [Visit NutriBox Api](https://nutribox-server.vercel.app/)
+# Client Site: [Visit NutriBox](https://nutribox-client.vercel.app/)
+# Server Site: [Visit NutriBox Api](https://nutribox-server.vercel.app/)
 ---
 
 ## Features
@@ -29,31 +29,31 @@ Server Site: [Visit NutriBox Api](https://nutribox-server.vercel.app/)
 
 ## API Routes
 ### Auth Routes
-- `POST /auth/login` - User login
-- `POST /auth/refresh-token` - Refresh JWT token
+- `POST /api/auth/login` - User login
+- `POST /api/auth/refresh-token` - Refresh JWT token
 
 ### User Routes
-- `POST /user/register` - Register a new user
-- `PATCH /user/profile-data` - Update profile data
-- `GET /user/my-data` - Get user details
+- `POST /api/user/register` - Register a new user
+- `PATCH /api/user/profile-data` - Update profile data
+- `GET /api/user/my-data` - Get user details
 
 ### Order Routes
-- `POST /orders` - Place an order (Customer)
-- `GET /orders/:orderId` - Get order details (Customer, Meal Provider)
-- `PATCH /orders/orderdetails/:orderId` - Update order details
-- `GET /orders/myorder/alldata` - Get customer orders
-- `GET /orders/allorder/mealprovider` - Get all orders for a meal provider
+- `POST /api/orders` - Place an order (Customer)
+- `GET /api/orders/:orderId` - Get order details (Customer, Meal Provider)
+- `PATCH /api/orders/orderdetails/:orderId` - Update order details
+- `GET /api/orders/myorder/alldata` - Get customer orders
+- `GET /api/orders/allorder/mealprovider` - Get all orders for a meal provider
 
 ### Meal Routes
-- `POST /meals/menu` - Add a new meal (Meal Provider)
-- `GET /meals` - Get all meals
-- `GET /meals/mymeals` - Get meal provider's meals
-- `GET /meals/:mealId` - Get meal details
-- `PATCH /meals/update/:mealId` - Update meal details
+- `POST /api/meals/menu` - Add a new meal (Meal Provider)
+- `GET /api/meals` - Get all meals
+- `GET /api/meals/mymeals` - Get meal provider's meals
+- `GET /api/meals/:mealId` - Get meal details
+- `PATCH /api/meals/update/:mealId` - Update meal details
 
 ### Meal Provider Routes
-- `POST /meal-provider` - Register as a meal provider
-- `GET /meal-provider/mydata` - Get meal provider's data
+- `POST /api/meal-provider` - Register as a meal provider
+- `GET /api/meal-provider/mydata` - Get meal provider's data
 
 ## Installation & Setup
 1. Clone the repository:
