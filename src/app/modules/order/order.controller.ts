@@ -12,11 +12,23 @@ const orderMealController = catchAsync(async (req, res) => {
   const {email,role} = req.user;
 
   const result = await OrderServices.orderMeal(
-    req.body,email,role);
+    req.body,email,role,req.ip!);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
     message: 'Order placed successfully',
+    data: result,
+  });
+});
+
+const verifyPayment = catchAsync(async (req, res) => {
+
+  const result = await OrderServices.verifyPayment(req.query.order_id as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Order verified successfully',
     data: result,
   });
 });
@@ -49,31 +61,7 @@ const getAllOrder = catchAsync(async (req, res) => {
 });
 
 
-// const verifyPayment = catchAsync(async (req, res) => {
-//   const result = await OrderServices.verifyPayment(req.query.order_id as string);
 
-//   sendResponse(res, {
-//     statusCode: httpStatus.CREATED,
-//     success: true,
-//     message: 'Order verified successfully',
-//     data: result,
-//   });
-// });
-
-
-// Get All CarsController
-// const getAllOrderController = catchAsync(async (req, res) => {
-//   const query = req.query
-
-//   const result = await OrderServices.allOrdersDetails(query);
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Orders fetched successfully",
-//     meta:result.meta,
-//     data: result.result,
-//   });
-// });
 
 // Get One CarController
 const oneOrderDetailsController =
@@ -131,14 +119,12 @@ const updateOrderController = catchAsync(async (req, res) => {
 // Calculate Revenue Controller
 
 
-
-
 export const OrderController = {
   orderMealController,
   updateOrderController,
   getMyOrder,
   getAllOrder,
-  // verifyPayment,
+  verifyPayment,
   // ordersRevenueController,
   // getAllOrderController,
   oneOrderDetailsController,

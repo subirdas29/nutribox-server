@@ -9,17 +9,26 @@ const OrderSchema = new mongoose_1.Schema({
     category: { type: String, required: true },
     status: { type: String, enum: ["pending", "in progress", "delivered", "cancelled"], default: "pending" },
     basePrice: { type: Number, required: true },
-    deliveryCharge: { type: Number, required: true },
-    portionPrice: { type: Number, required: true },
+    // deliveryCharge: { type: Number, required: true },
+    // portionPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
-    orderDate: { type: Date, required: true, default: Date.now },
+    // orderDate: { type: Date, required: true, default: Date.now },
     deliveryDate: { type: Date, required: true },
     deliveryTime: { type: String },
     portionSize: { type: String, enum: ["small", "medium", "large"], required: true },
     deliveryArea: { type: String, enum: ["dhaka", "outside-dhaka", "international"], required: true },
     deliveryAddress: { type: String, required: true },
     customizations: { type: [String] },
-    specialInstructions: { type: String }
+    specialInstructions: { type: String },
+    transaction: {
+        id: String,
+        transactionStatus: String,
+        bank_status: String,
+        sp_code: String,
+        sp_message: String,
+        method: String,
+        date_time: String,
+    },
 }, { timestamps: true });
 const Order = (0, mongoose_1.model)("Order", OrderSchema);
 exports.default = Order;

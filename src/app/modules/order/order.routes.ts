@@ -13,6 +13,7 @@ router.post('/',
  OrderController.orderMealController);
 
 
+ router.get("/verify", OrderController.verifyPayment);
 
 router.get('/:orderId', auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.oneOrderDetailsController);
 router.patch('/orderdetails/:orderId',auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.updateOrderController);

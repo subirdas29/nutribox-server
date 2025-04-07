@@ -23,9 +23,7 @@ const createMeal = async (payload: IMeal, email: string) => {
     mealProvider: mealProviderId?._id
   };
 
-
   const session = await mongoose.startSession();
-
   try {
     session.startTransaction();
 
@@ -148,9 +146,6 @@ const getSingleMeal = async (mealId: string) => {
  
 };
 
-
-
-
 //update Meal
 const updateMeal = async (
   mealId: string,
@@ -230,11 +225,6 @@ const updateMeal = async (
       await session.endSession();
       throw new Error('Failed to update meal');
     }
-
-
-
-
-  
 }
 
 export const mealService = {

@@ -20,11 +20,20 @@ const http_status_1 = __importDefault(require("http-status"));
 // Create Order Controller
 const orderMealController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, role } = req.user;
-    const result = yield order_service_1.OrderServices.orderMeal(req.body, email, role);
+    const result = yield order_service_1.OrderServices.orderMeal(req.body, email, role, req.ip);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
         message: 'Order placed successfully',
+        data: result,
+    });
+}));
+const verifyPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_service_1.OrderServices.verifyPayment(req.query.order_id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        success: true,
+        message: 'Order verified successfully',
         data: result,
     });
 }));
@@ -53,27 +62,6 @@ const getAllOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result.result,
     });
 }));
-// const verifyPayment = catchAsync(async (req, res) => {
-//   const result = await OrderServices.verifyPayment(req.query.order_id as string);
-//   sendResponse(res, {
-//     statusCode: httpStatus.CREATED,
-//     success: true,
-//     message: 'Order verified successfully',
-//     data: result,
-//   });
-// });
-// Get All CarsController
-// const getAllOrderController = catchAsync(async (req, res) => {
-//   const query = req.query
-//   const result = await OrderServices.allOrdersDetails(query);
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Orders fetched successfully",
-//     meta:result.meta,
-//     data: result.result,
-//   });
-// });
 // Get One CarController
 const oneOrderDetailsController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const orderId = req.params.orderId;
@@ -112,7 +100,7 @@ exports.OrderController = {
     updateOrderController,
     getMyOrder,
     getAllOrder,
-    // verifyPayment,
+    verifyPayment,
     // ordersRevenueController,
     // getAllOrderController,
     oneOrderDetailsController,
