@@ -116,29 +116,37 @@ const verifyPayment = async (order_id: string) => {
       throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
     }
 
-
+    const paymentStatus = verifiedPayment[0].bank_status;
+    let updatedMealStatus: "Pending" | "Failed" | "Cancelled" = "Pending";
+    
+    if (paymentStatus === "Success") {
+      updatedMealStatus = "Pending"; 
+    } else if (paymentStatus === "Failed") {
+      updatedMealStatus = "Failed";
+    } else {
+      updatedMealStatus = "Cancelled";
+    }
+    
+ 
 
     // Update the order status and transaction details
-    await Order.findOneAndUpdate(
+    await Order.updateOne(
       { "transaction.id": order_id },
       {
-        "transaction.bank_status": verifiedPayment[0].bank_status,
-        "transaction.sp_code": verifiedPayment[0].sp_code,
-        "transaction.sp_message": verifiedPayment[0].sp_message,
-        "transaction.transactionStatus": verifiedPayment[0].transaction_status,
-        "transaction.method": verifiedPayment[0].method,
-        "transaction.date_time": verifiedPayment[0].date_time,
-        status:
-          verifiedPayment[0].bank_status == "Success"
-            ? "Pending"
-            : verifiedPayment[0].bank_status == "Failed"
-            ? "Failed"
-            : verifiedPayment[0].bank_status == "Cancel"
-            ? "Cancelled"
-            : "",
+        $set: {
+          "transaction.bank_status": verifiedPayment[0].bank_status,
+          "transaction.sp_code": verifiedPayment[0].sp_code,
+          "transaction.sp_message": verifiedPayment[0].sp_message,
+          "transaction.transactionStatus": verifiedPayment[0].transaction_status,
+          "transaction.method": verifiedPayment[0].method,
+          "transaction.date_time": verifiedPayment[0].date_time,
+    
+ 
+          "selectedMeals.$[].status": updatedMealStatus,
+        },
       }
     );
-
+    // console.log("Updated Meals:", updatedOrder?.selectedMeals);
     // Update Meal stock if the payment is successful
     // if (verifiedPayment[0].bank_status === 'Success') {
     //   for (const item of order.cars) {

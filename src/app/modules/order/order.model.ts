@@ -12,7 +12,7 @@ const SelectedMealSchema = new Schema<ISelectedMeal>(
     orderPrice: { type: Number, required: true },
     status: {
       type: String,
-      enum: ["Pending", "In-Progress", "Delivered", "Cancelled"],
+      enum: ["Pending", "In-Progress", "Delivered", "Cancelled","Failed"],
       default: "Pending",
     },
     portionSize: { type: String, required: true },
@@ -45,7 +45,7 @@ const OrderSchema = new Schema<IOrder>(
     deliveryCharge: { type: Number, required: true },
     deliveryArea: { type: String, required: true },
     deliveryAddress: { type: String, required: true },
-    deliveryDate: { type: Date, required: true },
+    deliveryDate: { type: String, required: true },
     deliveryTime: { type: String },
     transaction: { type: TransactionSchema },
     paymentMethod: { type: String, required: true },

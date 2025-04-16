@@ -12,7 +12,7 @@ export interface ISelectedMeal {
   quantity: number;
   basePrice: number;
   orderPrice: number;
-  status?: "Pending" | "In-Progress" | "Delivered" | "Cancelled";
+  status?: "Pending" | "In-Progress" | "Delivered" | "Cancelled" | "Failed";
   portionSize: string;
   customizations: string[];
   specialInstructions: string;
@@ -35,7 +35,7 @@ export interface IOrder extends Document {
   deliveryArea: string;
   deliveryAddress: string;
   deliveryCharge:number,
-  deliveryDate: Date;
+  deliveryDate: string;
   deliveryTime?: string;
   transaction: ITransaction;
   paymentMethod: string;
