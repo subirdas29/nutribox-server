@@ -13,6 +13,9 @@ import { orderUtils } from "./order.utils";
 
 const orderMeal = async (payload: IOrder, email: string, role: string,client_ip:string) => {
   // Find the user (customer)
+
+  // console.log(payload,'checking-order')
+
   const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
@@ -23,40 +26,59 @@ const orderMeal = async (payload: IOrder, email: string, role: string,client_ip:
     throw new AppError(httpStatus.UNAUTHORIZED, "You must have a customer role to place an order");
   }
 
+
+
   // Find the meal
-  const meal = await Meal.findById(payload.mealId);
-  if (!meal) {
+
+  const allOrderMeals = payload.selectedMeals
+
+await Promise.all(
+      allOrderMeals.map(async(meal)=>{
+          const orderMeal = await Meal.findById(meal.mealId);
+  if (!orderMeal) {
     throw new AppError(httpStatus.NOT_FOUND, "Meal not found");
   }
 
-  if (meal.isDeleted) {
+  if (orderMeal.isDeleted) {
     throw new AppError(httpStatus.NOT_FOUND, "Meal is deleted");
   }
 
-  if (!meal.available) {
+  if (!orderMeal.available) {
     throw new AppError(httpStatus.BAD_REQUEST, "Meal is not available");
   }
+  return meal
+      })
+  )
+
+
 
   // Get the meal provider from the meal
-  const mealProvider = await MealProvider.findById(meal.mealProvider).select("_id");
-  if (!mealProvider) {
-    throw new AppError(httpStatus.NOT_FOUND, "Meal provider not found");
-  }
+ await Promise.all(
+    allOrderMeals.map(async(provider)=>{
+ const mealProviderData= await MealProvider.findById(provider.mealProviderId).select("_id");
+ if (!mealProviderData) {
+  throw new AppError(httpStatus.NOT_FOUND, "Meal provider not found");
+}
+    })
+  )
+ const allMealTotalPrice = allOrderMeals.reduce((sum,meal)=>sum+ meal.orderPrice,0)
 
-  // Prepare order data
-  const orderData = {
-    ...payload,
-    customerId: user._id, // Store the ObjectId, not the full object
-    mealProviderId: mealProvider._id,
-    mealId: meal._id,
-  };
+ const totalPrice = allMealTotalPrice + payload.deliveryCharge
+
+
+
+
 
   // Create the order
-  let order = await Order.create(orderData);
+  let order = await Order.create({
+    ...payload,
+    customerId: user._id, 
+    totalPrice
+  });
   
   // payment integration
   const shurjopayPayload = {
-    amount: payload.totalPrice,
+    amount: totalPrice,
     order_id: order._id,
     currency: "BDT",
     customer_name: user.name,
@@ -67,10 +89,7 @@ const orderMeal = async (payload: IOrder, email: string, role: string,client_ip:
     client_ip,
   };
 
-
   const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
-
-
 
 
   if (payment?.transactionStatus) {
@@ -78,7 +97,6 @@ const orderMeal = async (payload: IOrder, email: string, role: string,client_ip:
       transaction: {
         id: payment.sp_order_id,
         transactionStatus: payment.transactionStatus
-        
       },
     });
   }
@@ -112,9 +130,9 @@ const verifyPayment = async (order_id: string) => {
         "transaction.date_time": verifiedPayment[0].date_time,
         status:
           verifiedPayment[0].bank_status == "Success"
-            ? "Paid"
-            : verifiedPayment[0].bank_status == "Failed"
             ? "Pending"
+            : verifiedPayment[0].bank_status == "Failed"
+            ? "Failed"
             : verifiedPayment[0].bank_status == "Cancel"
             ? "Cancelled"
             : "",

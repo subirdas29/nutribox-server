@@ -1,38 +1,58 @@
 import { Schema, model } from "mongoose";
-import { IOrder } from "./order.interface";
+import { IOrder, ISelectedMeal, ITransaction } from "./order.interface";
+
+const SelectedMealSchema = new Schema<ISelectedMeal>(
+  {
+    mealId: { type: Schema.Types.ObjectId, required: true, ref: "Meal" },
+    mealProviderId: { type: Schema.Types.ObjectId, required: true, ref: "MealProvider" },
+    category: { type: String, required: true },
+    mealName: { type: String, required: true },
+    quantity: { type: Number, required: true },
+    basePrice: { type: Number, required: true },
+    orderPrice: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ["Pending", "In-Progress", "Delivered", "Cancelled"],
+      default: "Pending",
+    },
+    portionSize: { type: String, required: true },
+    customizations: { type: [String], default: [] },
+    specialInstructions: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const TransactionSchema = new Schema<ITransaction>(
+  {
+    id: { type: String, required: true },
+    transactionStatus: { type: String, required: true },
+    bank_status: { type: String, required: true },
+    sp_code: { type: String, required: true },
+    sp_message: { type: String, required: true },
+    method: { type: String, required: true },
+    date_time: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 
 
 const OrderSchema = new Schema<IOrder>(
   {
-    customerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  mealProviderId: { type: Schema.Types.ObjectId, ref: 'MealProvider', required: true },
-  mealId: { type: Schema.Types.ObjectId, ref: 'Meal', required: true },
-  mealName:{ type: String, required: true },
-  category:{ type: String, required: true },
-  status: { type: String, enum: ["pending", "in progress", "delivered","cancelled"], default: "pending" },
-  basePrice: { type: Number, required: true },
-  // deliveryCharge: { type: Number, required: true },
-  // portionPrice: { type: Number, required: true },
-  totalPrice: { type: Number, required: true },
-  // orderDate: { type: Date, required: true, default: Date.now },
-  deliveryDate: { type: Date, required: true },
-  deliveryTime: { type: String },
-  portionSize: { type: String, enum: ["small", "medium", "large"], required: true },
-  deliveryArea: { type: String, enum: ["dhaka", "outside-dhaka", "international"], required: true },
-  deliveryAddress: { type: String, required: true },
-  customizations: { type: [String] },
-  specialInstructions: { type: String },
-  transaction: {
-    id: String,
-    transactionStatus: String,
-    bank_status: String,
-    sp_code: String,
-    sp_message: String,
-    method: String,
-    date_time: String,
+    customerId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+    selectedMeals: { type: [SelectedMealSchema], required: true },
+    totalPrice: { type: Number, required: true },
+    deliveryCharge: { type: Number, required: true },
+    deliveryArea: { type: String, required: true },
+    deliveryAddress: { type: String, required: true },
+    deliveryDate: { type: Date, required: true },
+    deliveryTime: { type: String },
+    transaction: { type: TransactionSchema },
+    paymentMethod: { type: String, required: true },
   },
-  },
-  { timestamps: true } 
+  {
+    timestamps: true,
+  }
 );
 
 const Order = model<IOrder>("Order", OrderSchema);
