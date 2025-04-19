@@ -16,6 +16,7 @@ router.post('/',
  router.get("/verify", OrderController.verifyPayment);
 
 router.get('/:orderId', auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.oneOrderDetailsController);
+router.get('/:orderId/meal/:mealId',  OrderController.oneOrderMealController);
 router.patch('/orderdetails/:orderId',auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.updateOrderController);
 
 router.get('/myorder/alldata',auth(USER_ROLES.customer), OrderController.getMyOrder);

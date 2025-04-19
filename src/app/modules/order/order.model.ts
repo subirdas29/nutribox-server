@@ -19,7 +19,6 @@ const SelectedMealSchema = new Schema<ISelectedMeal>(
     customizations: { type: [String], default: [] },
     specialInstructions: { type: String, default: "" },
   },
-  { _id: false }
 );
 
 const TransactionSchema = new Schema<ITransaction>(
@@ -31,8 +30,7 @@ const TransactionSchema = new Schema<ITransaction>(
     sp_message: { type: String, required: true },
     method: { type: String, required: true },
     date_time: { type: String, required: true },
-  },
-  { _id: false }
+  }
 );
 
 

@@ -78,6 +78,22 @@ catchAsync(async (req, res) => {
   });
 });
 
+//Get One Order with Common delivery Address
+const oneOrderMealController =
+catchAsync(async (req, res) => {
+
+  const {orderId,mealId} = req.params;
+  const result = await OrderServices.oneOrderMealDetails(orderId,mealId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Order fetched successfully",
+    data: result,
+  });
+});
+
+
+
 
 
 const updateOrderController = catchAsync(async (req, res) => {
@@ -129,5 +145,6 @@ export const OrderController = {
   // ordersRevenueController,
   // getAllOrderController,
   oneOrderDetailsController,
+  oneOrderMealController
   // deleteOrder
 };

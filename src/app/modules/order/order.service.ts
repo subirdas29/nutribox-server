@@ -176,6 +176,38 @@ const oneOrderDetails = async (orderId: string) => {
  
 };
 
+//single Order with Common Delivery Address
+const oneOrderMealDetails = async (orderId: string,mealId:string) => {
+  
+  const order = await Order.findById(orderId)
+
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order is not found");
+  }
+
+  const selectedMeals = order.selectedMeals.find((meal)=>meal.mealId.toString() === mealId)
+
+  if(!selectedMeals){
+    throw new AppError(httpStatus.NOT_FOUND, "Meal is not found");
+  }
+
+  const result ={
+    _id:order._id,
+    customerId: order.customerId,
+    deliveryDate: order.deliveryDate,
+    deliveryTime: order.deliveryTime,
+    deliveryAddress: order.deliveryAddress,
+    deliveryArea: order.deliveryArea,
+    paymentMethod: order.paymentMethod,
+    selectedMeals:selectedMeals,
+    transaction:order.transaction
+  }
+
+  return result
+ 
+};
+
+
 
 const getAllOrder = async (query:Record<string,unknown>,email:string) => {
   const user = await User.findOne({email}).select('_id')
@@ -215,12 +247,17 @@ const getMyOrder = async (query:Record<string,unknown>,email:string) => {
   }
 
   const orderQuery = new QueryBuilder(Order.find({
-    customerId:user?._id}).populate('mealId').populate('mealProviderId'),query)
+    customerId:user?._id})
+    .populate({
+      path:"selectedMeals.mealId"
+    })
+    ,query)
   .filter()
   .sort()
   .paginate()
   .fields()
   // .search(userSearchableFields)
+
 
   const result = await orderQuery.modelQuery
   const meta = await orderQuery.countTotal()
@@ -254,5 +291,6 @@ export const OrderServices = {
   updateOrder,
   getMyOrder,
   getAllOrder,
-  verifyPayment
+  verifyPayment,
+  oneOrderMealDetails
 };
