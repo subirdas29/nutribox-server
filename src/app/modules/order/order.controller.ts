@@ -48,10 +48,10 @@ const getMyOrder = catchAsync(async (req, res) => {
 });
 
 //mealprovider order
-const getAllOrder = catchAsync(async (req, res) => {
+const getAllOrderOfMealProvider = catchAsync(async (req, res) => {
   const query = req.query
   const {email} = req.user
-  const result = await OrderServices.getAllOrder(query,email);
+  const result = await OrderServices.getAllOrderOfMealProvider(query,email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -140,7 +140,7 @@ export const OrderController = {
   orderMealController,
   updateOrderController,
   getMyOrder,
-  getAllOrder,
+  getAllOrderOfMealProvider,
   verifyPayment,
   // ordersRevenueController,
   // getAllOrderController,

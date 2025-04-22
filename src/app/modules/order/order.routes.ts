@@ -20,7 +20,7 @@ router.get('/:orderId/meal/:mealId',  OrderController.oneOrderMealController);
 router.patch('/orderdetails/:orderId',auth(USER_ROLES.customer,USER_ROLES.mealprovider), OrderController.updateOrderController);
 
 router.get('/myorder/alldata',auth(USER_ROLES.customer), OrderController.getMyOrder);
-router.get('/allorder/mealprovider',auth(USER_ROLES.mealprovider), OrderController.getAllOrder);
+router.get('/allorder/mealprovider',auth(USER_ROLES.mealprovider), OrderController.getAllOrderOfMealProvider);
 
 
 

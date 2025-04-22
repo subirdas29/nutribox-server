@@ -209,14 +209,19 @@ const oneOrderMealDetails = async (orderId: string,mealId:string) => {
 
 
 
-const getAllOrder = async (query:Record<string,unknown>,email:string) => {
-  const user = await User.findOne({email}).select('_id')
+const getAllOrderOfMealProvider = async (query:Record<string,unknown>,email:string) => {
+  const user = await User.findOne({email}).select('_id').lean()
  
   if(!user){
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    throw new AppError(httpStatus.NOT_FOUND, "Meal Provider not found");
   }
 
-  const mealProvider = await MealProvider.findOne({userId:user}).select('_id')
+  const mealProvider = await MealProvider.findOne({userId:user}).select('_id').lean()
+
+
+  const mealProviderOrderFilter = Order.find({'selectedMeals.mealProviderId':mealProvider?._id}).select('mealId')
+
+  console.log(mealProviderOrderFilter,'slected')
 
   if(!mealProvider){
     throw new AppError(httpStatus.NOT_FOUND, "mealProvider not found");
@@ -224,7 +229,9 @@ const getAllOrder = async (query:Record<string,unknown>,email:string) => {
 
 
 
-  const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').populate('mealId'),query)
+  const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').populate({
+    path:"selectedMeals.mealId"
+  }),query)
   .filter()
   .sort()
   .paginate()
@@ -290,7 +297,7 @@ export const OrderServices = {
   oneOrderDetails,
   updateOrder,
   getMyOrder,
-  getAllOrder,
+  getAllOrderOfMealProvider,
   verifyPayment,
   oneOrderMealDetails
 };
