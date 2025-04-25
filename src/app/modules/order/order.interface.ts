@@ -16,6 +16,7 @@ export interface ISelectedMeal {
   portionSize: string;
   customizations: string[];
   specialInstructions: string;
+  _id: Schema.Types.ObjectId;
 }
 
 export interface ITransaction {

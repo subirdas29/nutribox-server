@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -21,8 +22,10 @@ const user_model_1 = require("../user/user.model");
 const order_model_1 = __importDefault(require("./order.model"));
 const http_status_1 = __importDefault(require("http-status"));
 const order_utils_1 = require("./order.utils");
+const mongoose_1 = __importDefault(require("mongoose"));
 const orderMeal = (payload, email, role, client_ip) => __awaiter(void 0, void 0, void 0, function* () {
     // Find the user (customer)
+    // console.log(payload,'checking-order')
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
@@ -32,28 +35,34 @@ const orderMeal = (payload, email, role, client_ip) => __awaiter(void 0, void 0,
         throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You must have a customer role to place an order");
     }
     // Find the meal
-    const meal = yield Meal_model_1.default.findById(payload.mealId);
-    if (!meal) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal not found");
-    }
-    if (meal.isDeleted) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal is deleted");
-    }
-    if (!meal.available) {
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Meal is not available");
-    }
+    const allOrderMeals = payload.selectedMeals;
+    yield Promise.all(allOrderMeals.map((meal) => __awaiter(void 0, void 0, void 0, function* () {
+        const orderMeal = yield Meal_model_1.default.findById(meal.mealId);
+        if (!orderMeal) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal not found");
+        }
+        if (orderMeal.isDeleted) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal is deleted");
+        }
+        if (!orderMeal.available) {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Meal is not available");
+        }
+        return meal;
+    })));
     // Get the meal provider from the meal
-    const mealProvider = yield MealProvider_model_1.default.findById(meal.mealProvider).select("_id");
-    if (!mealProvider) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal provider not found");
-    }
-    // Prepare order data
-    const orderData = Object.assign(Object.assign({}, payload), { customerId: user._id, mealProviderId: mealProvider._id, mealId: meal._id });
+    yield Promise.all(allOrderMeals.map((provider) => __awaiter(void 0, void 0, void 0, function* () {
+        const mealProviderData = yield MealProvider_model_1.default.findById(provider.mealProviderId).select("_id");
+        if (!mealProviderData) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal provider not found");
+        }
+    })));
+    const allMealTotalPrice = allOrderMeals.reduce((sum, meal) => sum + meal.orderPrice, 0);
+    const totalPrice = allMealTotalPrice + payload.deliveryCharge;
     // Create the order
-    let order = yield order_model_1.default.create(orderData);
+    let order = yield order_model_1.default.create(Object.assign(Object.assign({}, payload), { customerId: user._id, totalPrice }));
     // payment integration
     const shurjopayPayload = {
-        amount: payload.totalPrice,
+        amount: totalPrice,
         order_id: order._id,
         currency: "BDT",
         customer_name: user.name,
@@ -81,22 +90,30 @@ const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* 
         if (!order) {
             throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'Order not found');
         }
+        const paymentStatus = verifiedPayment[0].bank_status;
+        let updatedMealStatus = "Pending";
+        if (paymentStatus === "Success") {
+            updatedMealStatus = "Pending";
+        }
+        else if (paymentStatus === "Failed") {
+            updatedMealStatus = "Failed";
+        }
+        else {
+            updatedMealStatus = "Cancelled";
+        }
         // Update the order status and transaction details
-        yield order_model_1.default.findOneAndUpdate({ "transaction.id": order_id }, {
-            "transaction.bank_status": verifiedPayment[0].bank_status,
-            "transaction.sp_code": verifiedPayment[0].sp_code,
-            "transaction.sp_message": verifiedPayment[0].sp_message,
-            "transaction.transactionStatus": verifiedPayment[0].transaction_status,
-            "transaction.method": verifiedPayment[0].method,
-            "transaction.date_time": verifiedPayment[0].date_time,
-            status: verifiedPayment[0].bank_status == "Success"
-                ? "Paid"
-                : verifiedPayment[0].bank_status == "Failed"
-                    ? "Pending"
-                    : verifiedPayment[0].bank_status == "Cancel"
-                        ? "Cancelled"
-                        : "",
+        yield order_model_1.default.updateOne({ "transaction.id": order_id }, {
+            $set: {
+                "transaction.bank_status": verifiedPayment[0].bank_status,
+                "transaction.sp_code": verifiedPayment[0].sp_code,
+                "transaction.sp_message": verifiedPayment[0].sp_message,
+                "transaction.transactionStatus": verifiedPayment[0].transaction_status,
+                "transaction.method": verifiedPayment[0].method,
+                "transaction.date_time": verifiedPayment[0].date_time,
+                "selectedMeals.$[].status": updatedMealStatus,
+            },
         });
+        // console.log("Updated Meals:", updatedOrder?.selectedMeals);
         // Update Meal stock if the payment is successful
         // if (verifiedPayment[0].bank_status === 'Success') {
         //   for (const item of order.cars) {
@@ -119,27 +136,71 @@ const oneOrderDetails = (orderId) => __awaiter(void 0, void 0, void 0, function*
     }
     return result;
 });
-const getAllOrder = (query, email) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findOne({ email }).select('_id');
-    if (!user) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
+//single Order with Common Delivery Address
+const oneOrderMealDetails = (orderId, mealId) => __awaiter(void 0, void 0, void 0, function* () {
+    const order = yield order_model_1.default.findById(orderId);
+    if (!order) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Order is not found");
     }
-    const mealProvider = yield MealProvider_model_1.default.findOne({ userId: user }).select('_id');
+    const selectedMeals = order.selectedMeals.find((meal) => meal._id.toString() === mealId);
+    if (!selectedMeals) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal is not found");
+    }
+    const result = {
+        _id: order._id,
+        customerId: order.customerId,
+        deliveryDate: order.deliveryDate,
+        deliveryTime: order.deliveryTime,
+        deliveryAddress: order.deliveryAddress,
+        deliveryArea: order.deliveryArea,
+        paymentMethod: order.paymentMethod,
+        selectedMeals: [selectedMeals],
+        transaction: order.transaction
+    };
+    return result;
+});
+const getAllOrderOfMealProvider = (query, email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.findOne({ email }).select('_id').lean();
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal Provider not found");
+    }
+    const mealProvider = yield MealProvider_model_1.default.findOne({ userId: user }).select('_id').lean();
     if (!mealProvider) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "mealProvider not found");
     }
-    const orderQuery = new QueryBuilder_1.default(order_model_1.default.find({ mealProviderId: mealProvider }).populate('customerId').populate('mealId'), query)
-        .filter()
-        .sort()
-        .paginate()
-        .fields();
-    // .search(userSearchableFields)
-    const result = yield orderQuery.modelQuery;
-    const meta = yield orderQuery.countTotal();
-    return {
-        result,
-        meta
-    };
+    const orderData = yield order_model_1.default.aggregate([
+        {
+            $unwind: '$selectedMeals'
+        },
+        {
+            $match: { 'selectedMeals.mealProviderId': mealProvider === null || mealProvider === void 0 ? void 0 : mealProvider._id }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "customerId",
+                foreignField: "_id",
+                as: "customerId"
+            }
+        },
+        { $unwind: '$customerId' },
+    ]);
+    const result = orderData.map((item) => (Object.assign(Object.assign({}, item), { selectedMeals: [item.selectedMeals] })));
+    // const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').populate({
+    //   path:"selectedMeals.mealId"
+    // }),query)
+    // .filter()
+    // .sort()
+    // .paginate()
+    // .fields()
+    // // .search(userSearchableFields)
+    // const result = await orderQuery.modelQuery
+    // const meta = await orderQuery.countTotal()
+    // return {
+    //   result,
+    //   meta
+    // };
+    return result;
 });
 const getMyOrder = (query, email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email });
@@ -148,7 +209,10 @@ const getMyOrder = (query, email) => __awaiter(void 0, void 0, void 0, function*
     }
     const orderQuery = new QueryBuilder_1.default(order_model_1.default.find({
         customerId: user === null || user === void 0 ? void 0 : user._id
-    }).populate('mealId').populate('mealProviderId'), query)
+    })
+        .populate({
+        path: "selectedMeals.mealId"
+    }), query)
         .filter()
         .sort()
         .paginate()
@@ -161,18 +225,44 @@ const getMyOrder = (query, email) => __awaiter(void 0, void 0, void 0, function*
         meta
     };
 });
-const updateOrder = (orderId, payload, email) => __awaiter(void 0, void 0, void 0, function* () {
+const updateOrder = (orderId, mealId, payload, email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email: email });
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
     }
-    return yield order_model_1.default.findByIdAndUpdate(orderId, payload, { new: true });
+    const order = yield order_model_1.default.findOne({ _id: orderId });
+    if (!order) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Order not found");
+    }
+    const orderMeal = yield order_model_1.default.findOne({
+        'selectedMeals._id': new mongoose_1.default.Types.ObjectId(mealId)
+    }).lean();
+    if (!orderMeal) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Order Meal not found");
+    }
+    const updateFields = {};
+    if (payload.deliveryDate)
+        updateFields.deliveryDate = payload.deliveryDate;
+    if (payload.deliveryTime)
+        updateFields.deliveryTime = payload.deliveryTime;
+    if (payload.deliveryAddress)
+        updateFields.deliveryAddress = payload.deliveryAddress;
+    if (payload.selectedMeals && payload.selectedMeals.length > 0) {
+        const selectedMealUpdate = payload.selectedMeals[0];
+        const result = yield order_model_1.default.updateOne({ _id: orderId, "selectedMeals._id": mealId }, {
+            $set: Object.assign(Object.assign({}, updateFields), { "selectedMeals.$": Object.assign({}, selectedMealUpdate) }),
+        });
+        return result;
+    }
+    const result = yield order_model_1.default.findByIdAndUpdate(orderId, { $set: updateFields }, { new: true });
+    return result;
 });
 exports.OrderServices = {
     orderMeal,
     oneOrderDetails,
     updateOrder,
     getMyOrder,
-    getAllOrder,
-    verifyPayment
+    getAllOrderOfMealProvider,
+    verifyPayment,
+    oneOrderMealDetails
 };

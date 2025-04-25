@@ -56,8 +56,9 @@ const getAllOrderOfMealProvider = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "All Orders fetched successfully",
-    meta:result.meta,
-    data: result.result,
+    // meta:result.meta,
+    data:result
+    // data: result.result,
   });
 });
 
@@ -99,12 +100,13 @@ catchAsync(async (req, res) => {
 const updateOrderController = catchAsync(async (req, res) => {
   const {
     body: payload,
-    params: { orderId },
+    params: { orderId,mealId },
   } = req;
 
   const {email} = req.user;
   const result = await OrderServices.updateOrder(
     orderId,
+    mealId,
     payload,
     email
   );
@@ -142,9 +144,8 @@ export const OrderController = {
   getMyOrder,
   getAllOrderOfMealProvider,
   verifyPayment,
-  // ordersRevenueController,
-  // getAllOrderController,
+
   oneOrderDetailsController,
   oneOrderMealController
-  // deleteOrder
+ 
 };

@@ -50,16 +50,17 @@ const getMyOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 //mealprovider order
-const getAllOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllOrderOfMealProvider = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
     const { email } = req.user;
-    const result = yield order_service_1.OrderServices.getAllOrder(query, email);
+    const result = yield order_service_1.OrderServices.getAllOrderOfMealProvider(query, email);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
         message: "All Orders fetched successfully",
-        meta: result.meta,
-        data: result.result,
+        // meta:result.meta,
+        data: result
+        // data: result.result,
     });
 }));
 // Get One CarController
@@ -73,10 +74,21 @@ const oneOrderDetailsController = (0, catchAsync_1.default)((req, res) => __awai
         data: result,
     });
 }));
+//Get One Order with Common delivery Address
+const oneOrderMealController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { orderId, mealId } = req.params;
+    const result = yield order_service_1.OrderServices.oneOrderMealDetails(orderId, mealId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Order fetched successfully",
+        data: result,
+    });
+}));
 const updateOrderController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { body: payload, params: { orderId }, } = req;
+    const { body: payload, params: { orderId, mealId }, } = req;
     const { email } = req.user;
-    const result = yield order_service_1.OrderServices.updateOrder(orderId, payload, email);
+    const result = yield order_service_1.OrderServices.updateOrder(orderId, mealId, payload, email);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -99,10 +111,8 @@ exports.OrderController = {
     orderMealController,
     updateOrderController,
     getMyOrder,
-    getAllOrder,
+    getAllOrderOfMealProvider,
     verifyPayment,
-    // ordersRevenueController,
-    // getAllOrderController,
     oneOrderDetailsController,
-    // deleteOrder
+    oneOrderMealController
 };

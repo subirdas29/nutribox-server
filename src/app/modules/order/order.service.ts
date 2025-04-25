@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
@@ -9,6 +10,7 @@ import Order from "./order.model";
 
 import httpStatus from 'http-status';
 import { orderUtils } from "./order.utils";
+import mongoose from "mongoose";
 
 
 const orderMeal = async (payload: IOrder, email: string, role: string,client_ip:string) => {
@@ -185,7 +187,7 @@ const oneOrderMealDetails = async (orderId: string,mealId:string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Order is not found");
   }
 
-  const selectedMeals = order.selectedMeals.find((meal)=>meal.mealId.toString() === mealId)
+  const selectedMeals = order.selectedMeals.find((meal)=>meal._id.toString() === mealId)
 
   if(!selectedMeals){
     throw new AppError(httpStatus.NOT_FOUND, "Meal is not found");
@@ -199,7 +201,7 @@ const oneOrderMealDetails = async (orderId: string,mealId:string) => {
     deliveryAddress: order.deliveryAddress,
     deliveryArea: order.deliveryArea,
     paymentMethod: order.paymentMethod,
-    selectedMeals:selectedMeals,
+    selectedMeals:[selectedMeals],
     transaction:order.transaction
   }
 
@@ -218,32 +220,35 @@ const getAllOrderOfMealProvider = async (query:Record<string,unknown>,email:stri
 
   const mealProvider = await MealProvider.findOne({userId:user}).select('_id').lean()
 
-
-  const mealProviderOrderFilter = Order.find({'selectedMeals.mealProviderId':mealProvider?._id}).select('mealId')
-
-  console.log(mealProviderOrderFilter,'slected')
-
   if(!mealProvider){
     throw new AppError(httpStatus.NOT_FOUND, "mealProvider not found");
   }
 
+const orderData = await Order.aggregate([
+    {
+      $unwind:'$selectedMeals'
+    },
+    {
+      $match:{'selectedMeals.mealProviderId':mealProvider?._id}
+    },
 
+    {
+      $lookup:{
+        from:"users",
+        localField:"customerId",
+        foreignField:"_id",
+        as:"customerId"
+      }
+    },
+    { $unwind: '$customerId' },
+  ])
 
-  const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').populate({
-    path:"selectedMeals.mealId"
-  }),query)
-  .filter()
-  .sort()
-  .paginate()
-  .fields()
-  // .search(userSearchableFields)
+const result = orderData.map((item)=>({
+  ...item,
+  selectedMeals:[item.selectedMeals]
+}))
 
-  const result = await orderQuery.modelQuery
-  const meta = await orderQuery.countTotal()
-  return {
-    result,
-    meta
-  };
+  return result
 };
 
 const getMyOrder = async (query:Record<string,unknown>,email:string) => {
@@ -277,6 +282,7 @@ const getMyOrder = async (query:Record<string,unknown>,email:string) => {
 
 const updateOrder = async (
   orderId: string,
+  mealId:string,
   payload: Partial<IOrder>,
   email: string
 ) => {
@@ -287,9 +293,60 @@ const updateOrder = async (
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
+  const order = await Order.findOne({_id:orderId})
 
-  return await Order.findByIdAndUpdate(orderId, payload, { new: true });
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order not found");
+  }
+
+  
+
+const orderMeal = await Order.findOne({
+  'selectedMeals._id': new mongoose.Types.ObjectId(mealId) 
+}).lean();
+
+
+  if (!orderMeal) {
+    throw new AppError(httpStatus.NOT_FOUND, "Order Meal not found");
+  }
+
+
+  const updateFields: any = {};
+
+  if (payload.deliveryDate) updateFields.deliveryDate = payload.deliveryDate;
+  if (payload.deliveryTime) updateFields.deliveryTime = payload.deliveryTime;
+  if (payload.deliveryAddress) updateFields.deliveryAddress = payload.deliveryAddress;
+  
+
+  if (payload.selectedMeals && payload.selectedMeals.length > 0) {
+    const selectedMealUpdate = payload.selectedMeals[0];
+  
+    const result = await Order.updateOne(
+      { _id: orderId, "selectedMeals._id": mealId },
+      {
+        $set: {
+          ...updateFields,
+          "selectedMeals.$": {
+            ...selectedMealUpdate,
+          },
+        },
+      }
+    );
+  
+    return result;
+  }
+  
+  const result = await Order.findByIdAndUpdate(
+    orderId,
+    { $set: updateFields },
+    { new: true }
+  );
+  
+  return result;
+  
+
 }
+
 
 
 export const OrderServices = {

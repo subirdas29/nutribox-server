@@ -18,6 +18,7 @@ const SelectedMealSchema = new Schema<ISelectedMeal>(
     portionSize: { type: String, required: true },
     customizations: { type: [String], default: [] },
     specialInstructions: { type: String, default: "" },
+    _id: { type: Schema.Types.ObjectId, required: true }
   },
 );
 
@@ -52,6 +53,8 @@ const OrderSchema = new Schema<IOrder>(
     timestamps: true,
   }
 );
+
+OrderSchema.index({ 'selectedMeals.mealProviderId': 1 });
 
 const Order = model<IOrder>("Order", OrderSchema);
 

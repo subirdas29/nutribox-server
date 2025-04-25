@@ -1,34 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const OrderSchema = new mongoose_1.Schema({
-    customerId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
-    mealProviderId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'MealProvider', required: true },
-    mealId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Meal', required: true },
-    mealName: { type: String, required: true },
+const SelectedMealSchema = new mongoose_1.Schema({
+    mealId: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Meal" },
+    mealProviderId: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "MealProvider" },
     category: { type: String, required: true },
-    status: { type: String, enum: ["pending", "in progress", "delivered", "cancelled"], default: "pending" },
+    mealName: { type: String, required: true },
+    quantity: { type: Number, required: true },
     basePrice: { type: Number, required: true },
-    // deliveryCharge: { type: Number, required: true },
-    // portionPrice: { type: Number, required: true },
-    totalPrice: { type: Number, required: true },
-    // orderDate: { type: Date, required: true, default: Date.now },
-    deliveryDate: { type: Date, required: true },
-    deliveryTime: { type: String },
-    portionSize: { type: String, enum: ["small", "medium", "large"], required: true },
-    deliveryArea: { type: String, enum: ["dhaka", "outside-dhaka", "international"], required: true },
-    deliveryAddress: { type: String, required: true },
-    customizations: { type: [String] },
-    specialInstructions: { type: String },
-    transaction: {
-        id: String,
-        transactionStatus: String,
-        bank_status: String,
-        sp_code: String,
-        sp_message: String,
-        method: String,
-        date_time: String,
+    orderPrice: { type: Number, required: true },
+    status: {
+        type: String,
+        enum: ["Pending", "In-Progress", "Delivered", "Cancelled", "Failed"],
+        default: "Pending",
     },
-}, { timestamps: true });
+    portionSize: { type: String, required: true },
+    customizations: { type: [String], default: [] },
+    specialInstructions: { type: String, default: "" },
+    _id: { type: mongoose_1.Schema.Types.ObjectId, required: true }
+});
+const TransactionSchema = new mongoose_1.Schema({
+    id: { type: String, required: true },
+    transactionStatus: { type: String, required: true },
+    bank_status: { type: String, required: true },
+    sp_code: { type: String, required: true },
+    sp_message: { type: String, required: true },
+    method: { type: String, required: true },
+    date_time: { type: String, required: true },
+});
+const OrderSchema = new mongoose_1.Schema({
+    customerId: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
+    selectedMeals: { type: [SelectedMealSchema], required: true },
+    totalPrice: { type: Number, required: true },
+    deliveryCharge: { type: Number, required: true },
+    deliveryArea: { type: String, required: true },
+    deliveryAddress: { type: String, required: true },
+    deliveryDate: { type: String, required: true },
+    deliveryTime: { type: String },
+    transaction: { type: TransactionSchema },
+    paymentMethod: { type: String, required: true },
+}, {
+    timestamps: true,
+});
+OrderSchema.index({ 'selectedMeals.mealProviderId': 1 });
 const Order = (0, mongoose_1.model)("Order", OrderSchema);
 exports.default = Order;
