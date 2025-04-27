@@ -18,7 +18,7 @@ const SelectedMealSchema = new Schema<ISelectedMeal>(
     portionSize: { type: String, required: true },
     customizations: { type: [String], default: [] },
     specialInstructions: { type: String, default: "" },
-    _id: { type: Schema.Types.ObjectId, required: true }
+   
   },
 );
 

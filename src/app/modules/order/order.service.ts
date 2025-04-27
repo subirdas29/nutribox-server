@@ -16,7 +16,7 @@ import mongoose from "mongoose";
 const orderMeal = async (payload: IOrder, email: string, role: string,client_ip:string) => {
   // Find the user (customer)
 
-  // console.log(payload,'checking-order')
+
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -66,9 +66,6 @@ await Promise.all(
  const allMealTotalPrice = allOrderMeals.reduce((sum,meal)=>sum+ meal.orderPrice,0)
 
  const totalPrice = allMealTotalPrice + payload.deliveryCharge
-
-
-
 
 
   // Create the order
@@ -128,8 +125,6 @@ const verifyPayment = async (order_id: string) => {
     } else {
       updatedMealStatus = "Cancelled";
     }
-    
- 
 
     // Update the order status and transaction details
     await Order.updateOne(
@@ -180,14 +175,16 @@ const oneOrderDetails = async (orderId: string) => {
 
 //single Order with Common Delivery Address
 const oneOrderMealDetails = async (orderId: string,mealId:string) => {
-  
+ 
   const order = await Order.findById(orderId)
 
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, "Order is not found");
   }
 
-  const selectedMeals = order.selectedMeals.find((meal)=>meal._id.toString() === mealId)
+  const selectedMeals = order.selectedMeals.find(
+    (meal) => meal && meal._id?.toString() === mealId
+  );
 
   if(!selectedMeals){
     throw new AppError(httpStatus.NOT_FOUND, "Meal is not found");

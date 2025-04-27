@@ -25,7 +25,6 @@ const order_utils_1 = require("./order.utils");
 const mongoose_1 = __importDefault(require("mongoose"));
 const orderMeal = (payload, email, role, client_ip) => __awaiter(void 0, void 0, void 0, function* () {
     // Find the user (customer)
-    // console.log(payload,'checking-order')
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
@@ -142,7 +141,7 @@ const oneOrderMealDetails = (orderId, mealId) => __awaiter(void 0, void 0, void 
     if (!order) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Order is not found");
     }
-    const selectedMeals = order.selectedMeals.find((meal) => meal._id.toString() === mealId);
+    const selectedMeals = order.selectedMeals.find((meal) => { var _a; return meal && ((_a = meal._id) === null || _a === void 0 ? void 0 : _a.toString()) === mealId; });
     if (!selectedMeals) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Meal is not found");
     }
@@ -186,20 +185,6 @@ const getAllOrderOfMealProvider = (query, email) => __awaiter(void 0, void 0, vo
         { $unwind: '$customerId' },
     ]);
     const result = orderData.map((item) => (Object.assign(Object.assign({}, item), { selectedMeals: [item.selectedMeals] })));
-    // const orderQuery = new QueryBuilder(Order.find({mealProviderId:mealProvider}).populate('customerId').populate({
-    //   path:"selectedMeals.mealId"
-    // }),query)
-    // .filter()
-    // .sort()
-    // .paginate()
-    // .fields()
-    // // .search(userSearchableFields)
-    // const result = await orderQuery.modelQuery
-    // const meta = await orderQuery.countTotal()
-    // return {
-    //   result,
-    //   meta
-    // };
     return result;
 });
 const getMyOrder = (query, email) => __awaiter(void 0, void 0, void 0, function* () {
