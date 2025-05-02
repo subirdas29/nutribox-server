@@ -56,19 +56,53 @@ const createMeal = (payload, email) => __awaiter(void 0, void 0, void 0, functio
 });
 //all meals for everyone
 const getAllMeals = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const mealQuery = new QueryBuilder_1.default(Meal_model_1.default.find({ isDeleted: false, available: true }).populate({
+    // const { minPrice, maxPrice, categories, mealName, iStock, ratings, ...pQuery } = query;
+    const filter = {
+        isDeleted: false,
+        available: true,
+    };
+    // Filter by mealName
+    // if (mealName) {
+    //   const mealArray = typeof mealName === 'string'
+    //     ? mealName.split(',')
+    //     : Array.isArray(mealName)
+    //       ? mealName
+    //       : [mealName];
+    //   filter.name = { $in: mealArray };
+    // }
+    // Filter by categories
+    // if (categories) {
+    //   const categoryArray = typeof categories === 'string'
+    //     ? categories.split(',')
+    //     : Array.isArray(categories)
+    //       ? categories
+    //       : [categories];
+    //   filter.category = { $in: categoryArray };
+    // }
+    // Filter by ratings
+    // if (ratings) {
+    //   const ratingArray = typeof ratings === 'string'
+    //     ? ratings.split(',')
+    //     : Array.isArray(ratings)
+    //       ? ratings
+    //       : [ratings];
+    //   filter.averageRating = { $in: ratingArray.map(Number) };
+    // }
+    const mealQuery = new QueryBuilder_1.default(Meal_model_1.default.find(filter).populate({
         path: 'mealProvider',
         populate: { path: 'userId' }
     }), query)
+        .search(['name', 'category'])
         .filter()
         .sort()
         .paginate()
         .fields();
-    const result = yield mealQuery.modelQuery;
+    // .priceRange(Number(minPrice) || 0, Number(maxPrice) || Infinity);
+    const result = yield mealQuery.modelQuery.lean();
     const meta = yield mealQuery.countTotal();
     return {
         result,
-        meta
+        meta,
     };
 });
 //all meals of provider own

@@ -201,7 +201,8 @@ const getMyOrder = (query, email) => __awaiter(void 0, void 0, void 0, function*
         .filter()
         .sort()
         .paginate()
-        .fields();
+        .fields()
+        .priceRange();
     // .search(userSearchableFields)
     const result = yield orderQuery.modelQuery;
     const meta = yield orderQuery.countTotal();

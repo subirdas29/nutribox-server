@@ -63,23 +63,67 @@ const createMeal = async (payload: IMeal, email: string) => {
 //all meals for everyone
 const getAllMeals = async (query: Record<string, unknown>) => {
 
+  // const { minPrice, maxPrice, categories, mealName, iStock, ratings, ...pQuery } = query;
 
-    const mealQuery = new QueryBuilder(Meal.find({isDeleted:false,available:true}).populate({
+  const filter: Record<string, any> = {
+    isDeleted: false,
+    available: true,
+  };
+
+  // Filter by mealName
+  // if (mealName) {
+  //   const mealArray = typeof mealName === 'string'
+  //     ? mealName.split(',')
+  //     : Array.isArray(mealName)
+  //       ? mealName
+  //       : [mealName];
+  //   filter.name = { $in: mealArray };
+  // }
+
+  // Filter by categories
+  // if (categories) {
+  //   const categoryArray = typeof categories === 'string'
+  //     ? categories.split(',')
+  //     : Array.isArray(categories)
+  //       ? categories
+  //       : [categories];
+  //   filter.category = { $in: categoryArray };
+  // }
+
+  // Filter by ratings
+  // if (ratings) {
+  //   const ratingArray = typeof ratings === 'string'
+  //     ? ratings.split(',')
+  //     : Array.isArray(ratings)
+  //       ? ratings
+  //       : [ratings];
+  //   filter.averageRating = { $in: ratingArray.map(Number) };
+  // }
+
+
+  const mealQuery = new QueryBuilder(
+    Meal.find(filter).populate({
       path: 'mealProvider',
-      populate:{path: 'userId'}}), query)
-        .filter()
-        .sort()
-        .paginate()
-        .fields();
-    
-    const result = await mealQuery.modelQuery;
-    const meta = await mealQuery.countTotal();
-    
-    return {
-        result,
-        meta
-    };
+      populate: { path: 'userId' }
+    }),
+    query
+  )
+    .search(['name', 'category'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+    // .priceRange(Number(minPrice) || 0, Number(maxPrice) || Infinity);
+
+  const result = await mealQuery.modelQuery.lean();
+  const meta = await mealQuery.countTotal();
+
+  return {
+    result,
+    meta,
+  };
 };
+
 
 //all meals of provider own
 const getMyMeal = async (email:string,query: Record<string, unknown>) => {
@@ -123,6 +167,7 @@ const getMyMeal = async (email:string,query: Record<string, unknown>) => {
 const getSingleMeal = async (mealId: string) => {
   const meal = await Meal.findById(mealId)
    
+ 
 
   if (!meal) {
      throw new AppError(httpStatus.NOT_FOUND, 'Meal not found');
@@ -141,6 +186,8 @@ const getSingleMeal = async (mealId: string) => {
     },
   }
 );
+
+
 
   return result
  

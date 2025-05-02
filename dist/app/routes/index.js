@@ -6,6 +6,7 @@ const order_routes_1 = require("../modules/order/order.routes");
 const auth_route_1 = require("../modules/auth/auth.route");
 const MealProvider_routes_1 = require("../modules/MealProvider/MealProvider.routes");
 const Meal_routes_1 = require("../modules/Meal/Meal.routes");
+const Contact_routes_1 = require("../modules/Contact/Contact.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -21,8 +22,12 @@ const moduleRoutes = [
         route: order_routes_1.OrderRoutes,
     },
     {
-        path: '/providers',
+        path: '/allmeals',
         route: Meal_routes_1.MealRoutes,
+    },
+    {
+        path: '/contact',
+        route: Contact_routes_1.ContactRoutes,
     },
     {
         path: '/provider',

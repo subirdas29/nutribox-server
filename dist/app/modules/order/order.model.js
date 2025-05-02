@@ -17,7 +17,6 @@ const SelectedMealSchema = new mongoose_1.Schema({
     portionSize: { type: String, required: true },
     customizations: { type: [String], default: [] },
     specialInstructions: { type: String, default: "" },
-    _id: { type: mongoose_1.Schema.Types.ObjectId }
 });
 const TransactionSchema = new mongoose_1.Schema({
     id: { type: String, required: true },

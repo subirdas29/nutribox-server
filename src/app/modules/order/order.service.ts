@@ -265,6 +265,7 @@ const getMyOrder = async (query:Record<string,unknown>,email:string) => {
   .sort()
   .paginate()
   .fields()
+  .priceRange()
   // .search(userSearchableFields)
 
 
@@ -295,7 +296,6 @@ const updateOrder = async (
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, "Order not found");
   }
-
   
 
 const orderMeal = await Order.findOne({

@@ -5,6 +5,7 @@ import { OrderRoutes } from '../modules/order/order.routes';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { ProvidersRoutes } from '../modules/MealProvider/MealProvider.routes';
 import { MealRoutes } from '../modules/Meal/Meal.routes';
+import { ContactRoutes } from '../modules/Contact/Contact.routes';
 
 
 const router = Router();
@@ -24,8 +25,12 @@ const moduleRoutes = [
     route: OrderRoutes,
   },
   {
-    path: '/providers',
+    path: '/allmeals',
     route:MealRoutes ,
+  },
+  {
+    path: '/contact',
+    route:ContactRoutes ,
   },
   {
     path:'/provider',

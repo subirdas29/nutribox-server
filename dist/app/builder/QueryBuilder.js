@@ -70,5 +70,18 @@ class QueryBuilder {
             };
         });
     }
+    priceRange(minPrice, maxPrice) {
+        const priceFilter = {};
+        if (minPrice !== undefined)
+            priceFilter.$gte = minPrice;
+        if (maxPrice !== undefined)
+            priceFilter.$lte = maxPrice;
+        if (minPrice !== undefined || maxPrice !== undefined) {
+            this.modelQuery = this.modelQuery.find({
+                price: priceFilter,
+            });
+        }
+        return this;
+    }
 }
 exports.default = QueryBuilder;
