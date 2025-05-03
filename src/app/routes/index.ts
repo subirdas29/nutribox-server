@@ -6,6 +6,7 @@ import { AuthRoutes } from '../modules/auth/auth.route';
 import { ProvidersRoutes } from '../modules/MealProvider/MealProvider.routes';
 import { MealRoutes } from '../modules/Meal/Meal.routes';
 import { ContactRoutes } from '../modules/Contact/Contact.routes';
+import { SubscribeRoutes } from '../modules/Subscribe/Subscribe.routes';
 
 
 const router = Router();
@@ -31,6 +32,10 @@ const moduleRoutes = [
   {
     path: '/contact',
     route:ContactRoutes ,
+  },
+  {
+    path: '/subscribe',
+    route:SubscribeRoutes ,
   },
   {
     path:'/provider',

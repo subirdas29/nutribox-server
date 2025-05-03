@@ -1,7 +1,7 @@
-import { Document } from "mongoose";
 
 
-export interface IContact extends Document {
+
+export interface IContact {
     name: string;                   
     email:string;
     message:string;
