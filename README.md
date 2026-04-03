@@ -4,8 +4,8 @@ NutriBox is a meal planning and delivery web application that allows users to pe
 
 ## 🌍 Live Demo
 
-# Client Site: [Visit NutriBox](https://nutribox-client.vercel.app/)
-# Server Site: [Visit NutriBox Api](https://nutribox-server.vercel.app/)
+# Client Site: [Visit NutriBox](https://nutribox-meal.vercel.app/)
+# Server Site: [Visit NutriBox Api](https://nutribox-server-zeta.vercel.app/)
 ---
 
 ## Features

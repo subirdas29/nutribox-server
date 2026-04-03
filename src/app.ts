@@ -11,8 +11,8 @@ app.use(cookieParser());
 app.use(
   cors({
     
-    // origin: 'https://nutribox-client.vercel.app',
-     origin: 'http://localhost:3000',
+    origin: 'https://nutribox-meal.vercel.app',
+    //  origin: 'http://localhost:3000',
     // origin: 'http://localhost:5173',
     
     credentials: true,
